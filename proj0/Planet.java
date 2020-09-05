@@ -2,7 +2,7 @@ public class Planet {
     /**
      * Gravitational constant in unit: N * m^2 / kg^2.
      */
-    static final double G = 6.67e-11;
+    private static final double G = 6.67e-11;
 
     /**
      * Current x position
