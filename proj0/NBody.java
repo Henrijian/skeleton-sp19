@@ -1,20 +1,5 @@
 public class NBody {
     /**
-     * body number line number in planet text file
-     */
-    private static final int BODY_NUM_LINE_IDX = 0;
-
-    /**
-     * radius line number in planet text file
-     */
-    private static final int RADIUS_LINE_IDX = 1;
-
-    /**
-     * body information line number in planet text file
-     */
-    private static final int BODY_INFO_LINE_IDX = 2;
-
-    /**
      * return radius from supplied planet text file path
      * @param planetTxtPath supplied planet text file path
      */
@@ -28,7 +13,7 @@ public class NBody {
      * return array of bodies from supplied planet text file path
      * @param planetTxtPath supplied planet text file path
      */
-    public static Planet[] readBodies(String planetTxtPath) {
+    public static Planet[] readPlanets(String planetTxtPath) {
         In f = new In(planetTxtPath);
         int bodyTotal = f.readInt();
         f.readDouble(); // pass through radius
@@ -70,7 +55,7 @@ public class NBody {
         double dt = Double.valueOf(args[1]);
         String filename = args[2];
         double radius = readRadius(filename);
-        Planet[] bodies = readBodies(filename);
+        Planet[] bodies = readPlanets(filename);
         /*
          * Initialize drawing environment
          */
