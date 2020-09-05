@@ -28,11 +28,11 @@ public class NBody {
      * return array of bodies from supplied planet text file path
      * @param planetTxtPath supplied planet text file path
      */
-    public static Body[] readBodies(String planetTxtPath) {
+    public static Planet[] readBodies(String planetTxtPath) {
         In f = new In(planetTxtPath);
         int bodyTotal = f.readInt();
         f.readDouble(); // pass through radius
-        Body [] bodies = new Body[bodyTotal];
+        Planet [] bodies = new Planet[bodyTotal];
         int bodyNum = 0;
         while (bodyNum < bodyTotal) {
             double xPos = f.readDouble();
@@ -41,7 +41,7 @@ public class NBody {
             double yVel = f.readDouble();
             double mass = f.readDouble();
             String imgFileName = f.readString();
-            Body body = new Body(xPos, yPos, xVel, yVel, mass, imgFileName);
+            Planet body = new Planet(xPos, yPos, xVel, yVel, mass, imgFileName);
             bodies[bodyNum] = body;
             bodyNum++;
         }
@@ -70,7 +70,7 @@ public class NBody {
         double dt = Double.valueOf(args[1]);
         String filename = args[2];
         double radius = readRadius(filename);
-        Body[] bodies = readBodies(filename);
+        Planet[] bodies = readBodies(filename);
         /*
          * Initialize drawing environment
          */
@@ -89,13 +89,13 @@ public class NBody {
             double[] xForces = new double[bodies.length];
             double[] yForces = new double[bodies.length];
             for (int i = 0; i < bodies.length; i++) {
-                Body b = bodies[i];
+                Planet b = bodies[i];
                 xForces[i] = b.calcNetForceExertedByX(bodies);
                 yForces[i] = b.calcNetForceExertedByY(bodies);
             }
             drawBackground();
             for (int i = 0; i < bodies.length; i++) {
-                Body b = bodies[i];
+                Planet b = bodies[i];
                 b.update(dt, xForces[i], yForces[i]);
                 b.draw();
             }
@@ -108,7 +108,7 @@ public class NBody {
          */
         StdOut.printf("%d\n", bodies.length);
         StdOut.printf("%.2e\n", radius);
-        for (Body b: bodies) {
+        for (Planet b: bodies) {
             StdOut.printf("%11.4e %11.4e %11.4e %11.4e %11.4e %12s\n",
                           b.xxPos, b.yyPos, b.xxVel, b.yyVel, b.mass, b.imgFileName);
         }

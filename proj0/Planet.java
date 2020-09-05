@@ -1,4 +1,4 @@
-public class Body {
+public class Planet {
     /**
      * Gravitational constant in unit: N * m^2 / kg^2.
      */
@@ -38,7 +38,7 @@ public class Body {
      * Calculate distance between this body and supplied body
      * @param b supplied body
      */
-    public double calcDistance(Body b) {
+    public double calcDistance(Planet b) {
         double xDelta = b.xxPos - xxPos;
         double yDelta = b.yyPos - yyPos;
         double distanceSqr = Math.pow(xDelta, 2) + Math.pow(yDelta, 2);
@@ -50,7 +50,7 @@ public class Body {
      * Calculate force exerted by supplied body to this body
      * @param b supplied body
      */
-    public double calcForceExertedBy(Body b) {
+    public double calcForceExertedBy(Planet b) {
         double distance = calcDistance(b);
         double force = mass * b.mass / Math.pow(distance, 2) * G;
         return force;
@@ -60,7 +60,7 @@ public class Body {
      * Calculate x-component of the exerted force by supplied body
      * @param b supplied body
      */
-    public double calcForceExertedByX(Body b) {
+    public double calcForceExertedByX(Planet b) {
         double force = calcForceExertedBy(b);
         double cosine = (b.xxPos - xxPos) / calcDistance(b);
         double xForce = force * cosine;
@@ -71,7 +71,7 @@ public class Body {
      * Calculate y-component of the exerted force by supplied body
      * @param b supplied body
      */
-    public double calcForceExertedByY(Body b) {
+    public double calcForceExertedByY(Planet b) {
       double force = calcForceExertedBy(b);
       double sine = (b.yyPos - yyPos) / calcDistance(b);
       double yForce = force * sine;
@@ -82,9 +82,9 @@ public class Body {
      * Calculate net x-component of the exerted forces by supplied group of bodies
      * @param bodies supplied group of bodies
      */
-    public double calcNetForceExertedByX(Body[] bodies) {
+    public double calcNetForceExertedByX(Planet[] bodies) {
         double xForce = 0;
-        for (Body b : bodies) {
+        for (Planet b : bodies) {
             if (this.equals(b)) {
                 continue;
             }
@@ -97,9 +97,9 @@ public class Body {
      * Calculate net y-component of the exerted forces by supplied group of bodies
      * @param bodies supplied group of bodies
      */
-    public double calcNetForceExertedByY(Body[] bodies) {
+    public double calcNetForceExertedByY(Planet[] bodies) {
       double yForce = 0;
-      for (Body b : bodies) {
+      for (Planet b : bodies) {
           if (this.equals(b)) {
               continue;
           }
@@ -130,7 +130,7 @@ public class Body {
         StdDraw.picture(xxPos, yyPos, String.format("./images/%s", imgFileName));
     }
 
-    public Body(double xP, double yP, double xV,
+    public Planet(double xP, double yP, double xV,
                    double yV, double m, String img) {
         xxPos = xP;
         yyPos = yP;
@@ -140,7 +140,7 @@ public class Body {
         imgFileName = img;
     }
 
-    public Body(Body b) {
+    public Planet(Planet b) {
         xxPos = b.xxPos;
         yyPos = b.yyPos;
         xxVel = b.xxVel;
