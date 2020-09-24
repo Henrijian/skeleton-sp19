@@ -213,6 +213,19 @@ public class LinkedListDequeTest {
 	}
 
 	@Test
+	public void testGetRecursive() {
+		LinkedListDeque<Integer> input1 = new LinkedListDeque<Integer>(1, 2, 3, 4, 5);
+		Integer actual1 = input1.getRecursive(2);
+		Integer expected1 = 3;
+		assertEquals(expected1, actual1);
+
+		LinkedListDeque<Integer> input2 = new LinkedListDeque<Integer>(2, 4, 6, 8);
+		Integer actual2 = input2.getRecursive(4);
+		Integer expected2 = null;
+		assertEquals(expected2, actual2);
+	}
+
+	@Test
 	public void testLinkedListDeque() {
 		LinkedListDeque<Integer> input1 = new LinkedListDeque<Integer>(1, 2, 3, 4, 5);
 		LinkedListDeque<Integer> actual1 = new LinkedListDeque<Integer>(input1);

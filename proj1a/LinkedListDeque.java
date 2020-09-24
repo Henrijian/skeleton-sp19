@@ -149,4 +149,21 @@ public class LinkedListDeque<T> {
         }
         return p.item;
     }
+
+    /** Get the node farther than p distance.  */
+    private Node getNodeAfter(Node p, int distance) {
+        if (p == null || distance == 0) {
+            return p;
+        }
+        return getNodeAfter(p.next, distance - 1);
+    }
+
+    /** Same as get, but uses recursion. */
+    public T getRecursive(int index) {
+        Node p = getNodeAfter(sentinel.next, index);
+        if (p == null) {
+            return null;
+        }
+        return p.item;
+    }
 }
