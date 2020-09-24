@@ -13,7 +13,7 @@ public class ArrayDeque<T> {
      * 4. the first item is at 0 position in array.
      */
     public ArrayDeque() {
-        array = (T[])new Object[8];
+        array = (T[]) new Object[8];
         size = 0;
     }
 
@@ -21,7 +21,7 @@ public class ArrayDeque<T> {
     public ArrayDeque(T... items) {
         this();
         while (array.length < items.length) {
-            array = (T[])new Object[array.length * EXPAND_FACTOR];
+            array = (T[]) new Object[array.length * EXPAND_FACTOR];
         }
         for (int i = 0; i < items.length; i++) {
             array[i] = items[i];
@@ -65,12 +65,13 @@ public class ArrayDeque<T> {
         return true;
     }
 
-    /** Resize array to the given length, if length is negative number, resize array to empty array. */
+    /** Resize array to the given length, if length is negative number,
+     * resize array to empty array. */
     private void resize(int length) {
         if (length < 0) {
             length = 0;
         }
-        T[] temp = (T[])new Object[length];
+        T[] temp = (T[]) new Object[length];
         System.arraycopy(array, 0, temp, 0, size);
         array = temp;
     }
@@ -112,7 +113,8 @@ public class ArrayDeque<T> {
         System.out.println();
     }
 
-    /** Removes and returns the item at the front of the deque. If no such item exists, returns null. */
+    /** Removes and returns the item at the front of the deque.
+     * If no such item exists, returns null. */
     public T removeFirst() {
         if (size == 0) {
             return null;
@@ -120,14 +122,15 @@ public class ArrayDeque<T> {
         T removedItem = array[0];
         System.arraycopy(array, 1, array, 0, size - 1);
         size--;
-        double usage = (double)size / (double)array.length;
+        double usage = (double) size / (double) array.length;
         if (usage < USAGE_FACTOR) {
             resize(array.length / SHRINK_FACTOR);
         }
         return removedItem;
     }
 
-    /** Removes and returns the item at the back of the deque. If no such item exists, returns null. */
+    /** Removes and returns the item at the back of the deque.
+     * If no such item exists, returns null. */
     public T removeLast() {
         if (size == 0) {
             return null;
@@ -135,7 +138,7 @@ public class ArrayDeque<T> {
         T removedItem = array[size - 1];
         array[size - 1] = null;
         size--;
-        double usage = (double)size / (double)array.length;
+        double usage = (double) size / (double) array.length;
         if (usage < USAGE_FACTOR) {
             resize(array.length / SHRINK_FACTOR);
         }
