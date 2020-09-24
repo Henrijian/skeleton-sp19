@@ -30,12 +30,12 @@ public class ArrayDeque<T> {
 //    }
 
     /** Creates a deep copy of other. */
-    public ArrayDeque(ArrayDeque other) {
-        this();
-        for (int i = 0; i < other.size(); i++) {
-            addLast((T) other.get(i));
-        }
-    }
+//    public ArrayDeque(ArrayDeque other) {
+//        this();
+//        for (int i = 0; i < other.size(); i++) {
+//            addLast((T) other.get(i));
+//        }
+//    }
 
     /** Return the number of added items in deque. */
     public int size() {

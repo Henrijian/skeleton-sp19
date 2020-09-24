@@ -33,27 +33,27 @@ public class LinkedListDeque<T> {
         size = 0;
     }
 
-    @SafeVarargs
-    public LinkedListDeque(T... items) {
-        this();
-        Node p = sentinel;
-        for (T item : items) {
-            Node newItem = new Node(item);
-            newItem.prev = p;
-            p.next = newItem;
-            newItem.next = sentinel;
-            sentinel.prev = newItem;
-            p = newItem;
-            size++;
-        }
-    }
+//    @SafeVarargs
+//    public LinkedListDeque(T... items) {
+//        this();
+//        Node p = sentinel;
+//        for (T item : items) {
+//            Node newItem = new Node(item);
+//            newItem.prev = p;
+//            p.next = newItem;
+//            newItem.next = sentinel;
+//            sentinel.prev = newItem;
+//            p = newItem;
+//            size++;
+//        }
+//    }
 
-    public LinkedListDeque(LinkedListDeque<T> other) {
-        this();
-        for (int i = 0; i < other.size(); i++) {
-            addLast(other.get(i));
-        }
-    }
+//    public LinkedListDeque(LinkedListDeque<T> other) {
+//        this();
+//        for (int i = 0; i < other.size(); i++) {
+//            addLast(other.get(i));
+//        }
+//    }
 
     /** Return the number of the added items in list. */
     public int size() {
@@ -61,7 +61,7 @@ public class LinkedListDeque<T> {
     }
 
     /** Check if the items in list are equal to compare. */
-    public boolean equals(LinkedListDeque<T> compare) {
+    private boolean equals(LinkedListDeque<T> compare) {
         if (size != compare.size) {
             return false;
         }
