@@ -4,6 +4,7 @@ public class ArrayDeque<T> {
     private final int EXPAND_FACTOR = 2;
     private final double USAGE_FACTOR = 0.25;
     private final int SHRINK_FACTOR = 2;
+    private final int MINIMUM_ARRAY_SIZE = 8;
 
     /**
      * invariant:
@@ -17,23 +18,22 @@ public class ArrayDeque<T> {
         size = 0;
     }
 
-    @SafeVarargs
-    public ArrayDeque(T... items) {
-        this();
-        while (array.length < items.length) {
-            array = (T[]) new Object[array.length * EXPAND_FACTOR];
-        }
-        for (int i = 0; i < items.length; i++) {
-            array[i] = items[i];
-            size++;
-        }
-    }
+//    public ArrayDeque(T... items) {
+//        this();
+//        while (array.length < items.length) {
+//            array = (T[]) new Object[array.length * EXPAND_FACTOR];
+//        }
+//        for (int i = 0; i < items.length; i++) {
+//            array[i] = items[i];
+//            size++;
+//        }
+//    }
 
     /** Creates a deep copy of other. */
-    public ArrayDeque(ArrayDeque<T> other) {
+    public ArrayDeque(ArrayDeque other) {
         this();
         for (int i = 0; i < other.size(); i++) {
-            addLast(other.get(i));
+            addLast((T) other.get(i));
         }
     }
 
@@ -51,7 +51,7 @@ public class ArrayDeque<T> {
     }
 
     /** Check if the items in deque are equal to compare. */
-    public boolean equals(ArrayDeque<T> compare) {
+    private boolean equals(ArrayDeque<T> compare) {
         if (size != compare.size) {
             return false;
         }
@@ -65,11 +65,11 @@ public class ArrayDeque<T> {
         return true;
     }
 
-    /** Resize array to the given length, if length is negative number,
-     * resize array to empty array. */
+    /** Resize array to the given length, if length is less than 1,
+     * resize array to 1-size array. */
     private void resize(int length) {
-        if (length < 0) {
-            length = 0;
+        if (length < 1) {
+            length = 1;
         }
         T[] temp = (T[]) new Object[length];
         System.arraycopy(array, 0, temp, 0, size);
