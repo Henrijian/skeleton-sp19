@@ -1,10 +1,14 @@
 public class ArrayDeque<T> {
-    private T[] array;
-    private int size;
     private final int EXPAND_FACTOR = 2;
     private final double USAGE_FACTOR = 0.25;
     private final int SHRINK_FACTOR = 2;
     private final int MINIMUM_ARRAY_SIZE = 8;
+
+    private T[] items;
+    private int nextFirst;
+    private int nextLast;
+    private int size;
+
 
     /**
      * invariant:
@@ -14,28 +18,71 @@ public class ArrayDeque<T> {
      * 4. the first item is at 0 position in array.
      */
     public ArrayDeque() {
-        array = (T[]) new Object[8];
+        items = (T[]) new Object[MINIMUM_ARRAY_SIZE];
         size = 0;
+        nextFirst = (int) Math.random() * MINIMUM_ARRAY_SIZE;
+        nextLast = getNext(nextFirst, 0, items.length - 1);
     }
 
-//    public ArrayDeque(T... items) {
-//        this();
-//        while (array.length < items.length) {
-//            array = (T[]) new Object[array.length * EXPAND_FACTOR];
-//        }
-//        for (int i = 0; i < items.length; i++) {
-//            array[i] = items[i];
-//            size++;
-//        }
-//    }
+    public ArrayDeque(T... items) {
+        this();
+        int newSize = items.length;
+        while (newSize < items.length) {
+            newSize = newSize * EXPAND_FACTOR;
+        }
+        resize(newSize);
+        for (int i = 0; i < items.length; i++) {
+            addLast(items[i]);
+        }
+    }
+
+    /** Get previous index of the given index. */
+    private int getPrevious(int index, int start, int end) throws IndexOutOfBoundsException {
+        if (index < start || end < index) {
+            throw new IndexOutOfBoundsException("Given index must be in boundary.");
+        }
+        if (index == 0) {
+            return end;
+        }
+        return index - 1;
+    }
+
+    private int getPrevious(int index, int start, int end, int distance) throws IndexOutOfBoundsException {
+        int curIdx = index;
+        while (distance > 0) {
+            curIdx = getPrevious(curIdx, start, end);
+            distance--;
+        }
+        return curIdx;
+    }
+
+    /** Get next index of the given index. */
+    private int getNext(int index, int start, int end) throws IndexOutOfBoundsException {
+        if (index < start || end < index) {
+            throw new IndexOutOfBoundsException("Given index must be in boundary.");
+        }
+        if (index == end) {
+            return start;
+        }
+        return index + 1;
+    }
+
+    private int getNext(int index, int distance, int start, int end) throws IndexOutOfBoundsException {
+        int curIdx = index;
+        while (distance > 0) {
+            curIdx = getNext(curIdx, start, end);
+            distance--;
+        }
+        return curIdx;
+    }
 
     /** Creates a deep copy of other. */
-//    public ArrayDeque(ArrayDeque other) {
-//        this();
-//        for (int i = 0; i < other.size(); i++) {
-//            addLast((T) other.get(i));
-//        }
-//    }
+    public ArrayDeque(ArrayDeque other) {
+        this();
+        for (int i = 0; i < other.size(); i++) {
+            addLast((T) other.get(i));
+        }
+    }
 
     /** Return the number of added items in deque. */
     public int size() {
@@ -47,7 +94,8 @@ public class ArrayDeque<T> {
         if (i < 0 || size <= i) {
             return null;
         }
-        return array[i];
+        int itemIdx = getNext(nextFirst, i + 1, 0, items.length - 1);
+        return items[itemIdx];
     }
 
     /** Check if the items in deque are equal to compare. */
@@ -67,30 +115,48 @@ public class ArrayDeque<T> {
 
     /** Resize array to the given length, if length is negative value,
      * resize array to empty array. */
-    private void resize(int length, int oldPos, int newPos) {
+    private void resize(int length) {
         if (length < 0) {
             length = 0;
         }
         T[] temp = (T[]) new Object[length];
-        System.arraycopy(array, oldPos, temp, newPos, size);
-        array = temp;
+        int first = getNext(nextFirst, 0, items.length - 1);
+        int last = getPrevious(nextLast, 0, items.length - 1);
+        nextFirst = (int) Math.random() * temp.length;
+        if (size < temp.length) {
+            nextLast = getNext(nextFirst, size + 1, 0, temp.length - 1);
+        } else {
+            nextLast = nextFirst;
+            size = items.length;
+        }
+        if (first < last) {
+            System.arraycopy(items, first, temp, getNext(nextFirst, 0, items.length - 1), size);
+        } else {
+            int pos = getNext(nextFirst, 0, temp.length - 1);
+            System.arraycopy(items, first, temp, pos, items.length - first);
+            pos = getNext(nextFirst, items.length - first + 1, 0, temp.length - 1);
+            System.arraycopy(items, 0, temp, pos, last + 1);
+        }
+        items = temp;
     }
 
     /** Adds an item of type T to the front of the deque. */
     public void addFirst(T item) {
-        if (size == array.length) {
-            resize(size * EXPAND_FACTOR, 0, 1);
+        if (size == items.length) {
+            resize(size * EXPAND_FACTOR);
         }
-        array[0] = item;
+        items[nextFirst] = item;
+        nextFirst = getPrevious(nextFirst, 0, items.length - 1);
         size++;
     }
 
     /** Adds an item of type T to the back of the deque. */
     public void addLast(T item) {
-        if (size == array.length) {
-            resize(size * EXPAND_FACTOR, 0, 0);
+        if (size == items.length) {
+            resize(size * EXPAND_FACTOR);
         }
-        array[size] = item;
+        items[nextLast] = item;
+        nextLast = getNext(nextLast, 0, items.length - 1);
         size++;
     }
 
@@ -104,9 +170,9 @@ public class ArrayDeque<T> {
     public void printDeque() {
         for (int i = 0; i < size; i++) {
             if (i != size - 1) {
-                System.out.printf("%s ", array[i]);
+                System.out.printf("%s ", get(i));
             } else {
-                System.out.printf("%s", array[i]);
+                System.out.printf("%s", get(i));
             }
         }
         System.out.println();
@@ -118,12 +184,14 @@ public class ArrayDeque<T> {
         if (size == 0) {
             return null;
         }
-        T removedItem = array[0];
-        System.arraycopy(array, 1, array, 0, size - 1);
+        int first = getNext(nextFirst, 0, items.length - 1);
+        T removedItem = items[first];
+        nextFirst = first;
+        items[first] = null;
         size--;
-        double usage = (double) size / (double) array.length;
-        if (usage < USAGE_FACTOR && array.length > MINIMUM_ARRAY_SIZE) {
-            resize(array.length / SHRINK_FACTOR, 0, 0);
+        double usage = (double) size / (double) items.length;
+        if (usage < USAGE_FACTOR && items.length > MINIMUM_ARRAY_SIZE) {
+            resize(items.length / SHRINK_FACTOR);
         }
         return removedItem;
     }
@@ -134,12 +202,14 @@ public class ArrayDeque<T> {
         if (size == 0) {
             return null;
         }
-        T removedItem = array[size - 1];
-        array[size - 1] = null;
+        int last = getPrevious(nextLast, 0, items.length - 1);
+        T removedItem = items[last];
+        nextLast = last;
+        items[last] = null;
         size--;
-        double usage = (double) size / (double) array.length;
-        if (usage < USAGE_FACTOR && array.length > MINIMUM_ARRAY_SIZE) {
-            resize(array.length / SHRINK_FACTOR, 0, 0);
+        double usage = (double) size / (double) items.length;
+        if (usage < USAGE_FACTOR && items.length > MINIMUM_ARRAY_SIZE) {
+            resize(items.length / SHRINK_FACTOR);
         }
         return removedItem;
     }
