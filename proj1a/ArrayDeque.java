@@ -24,17 +24,25 @@ public class ArrayDeque<T> {
         nextLast = getNext(nextFirst, 0, items.length - 1);
     }
 
-    public ArrayDeque(T... items) {
-        this();
-        int newSize = items.length;
-        while (newSize < items.length) {
-            newSize = newSize * EXPAND_FACTOR;
-        }
-        resize(newSize);
-        for (int i = 0; i < items.length; i++) {
-            addLast(items[i]);
-        }
-    }
+//    public ArrayDeque(T... items) {
+//        this();
+//        int newSize = items.length;
+//        while (newSize < items.length) {
+//            newSize = newSize * EXPAND_FACTOR;
+//        }
+//        resize(newSize);
+//        for (int i = 0; i < items.length; i++) {
+//            addLast(items[i]);
+//        }
+//    }
+
+//    /** Creates a deep copy of other. */
+//    public ArrayDeque(ArrayDeque other) {
+//        this();
+//        for (int i = 0; i < other.size(); i++) {
+//            addLast((T) other.get(i));
+//        }
+//    }
 
     /** Get previous index of the given index. */
     private int getPrevious(int index, int start, int end) throws IndexOutOfBoundsException {
@@ -47,7 +55,8 @@ public class ArrayDeque<T> {
         return index - 1;
     }
 
-    private int getPrevious(int index, int start, int end, int distance) throws IndexOutOfBoundsException {
+    private int getPrevious(int index, int start, int end, int distance)
+            throws IndexOutOfBoundsException {
         int curIdx = index;
         while (distance > 0) {
             curIdx = getPrevious(curIdx, start, end);
@@ -67,21 +76,14 @@ public class ArrayDeque<T> {
         return index + 1;
     }
 
-    private int getNext(int index, int distance, int start, int end) throws IndexOutOfBoundsException {
+    private int getNext(int index, int distance, int start, int end)
+            throws IndexOutOfBoundsException {
         int curIdx = index;
         while (distance > 0) {
             curIdx = getNext(curIdx, start, end);
             distance--;
         }
         return curIdx;
-    }
-
-    /** Creates a deep copy of other. */
-    public ArrayDeque(ArrayDeque other) {
-        this();
-        for (int i = 0; i < other.size(); i++) {
-            addLast((T) other.get(i));
-        }
     }
 
     /** Return the number of added items in deque. */
