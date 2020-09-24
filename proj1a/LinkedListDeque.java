@@ -1,16 +1,16 @@
 public class LinkedListDeque<T> {
     private class Node {
-        public T item;
-        public Node next;
-        public Node prev;
+        private T item;
+        private Node next;
+        private Node prev;
 
-        public Node(T item, Node next, Node prev) {
+        private Node(T item, Node next, Node prev) {
             this.item = item;
             this.next = next;
             this.prev = prev;
         }
 
-        public Node(T item) {
+        private Node(T item) {
             this(item, null, null);
         }
     }
@@ -138,7 +138,7 @@ public class LinkedListDeque<T> {
     }
 
     /** Get the ith item in list(0 based), if no such item exists return null. */
-    public T get(int i){
+    public T get(int i) {
         if (i < 0 || i >= size) {
             return null;
         }
