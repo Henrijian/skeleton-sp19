@@ -65,23 +65,22 @@ public class ArrayDeque<T> {
         return true;
     }
 
-    /** Resize array to the given length, if length is less than 1,
-     * resize array to 1-size array. */
-    private void resize(int length) {
-        if (length < 1) {
-            length = 1;
+    /** Resize array to the given length, if length is negative value,
+     * resize array to empty array. */
+    private void resize(int length, int oldPos, int newPos) {
+        if (length < 0) {
+            length = 0;
         }
         T[] temp = (T[]) new Object[length];
-        System.arraycopy(array, 0, temp, 0, size);
+        System.arraycopy(array, oldPos, temp, newPos, size);
         array = temp;
     }
 
     /** Adds an item of type T to the front of the deque. */
     public void addFirst(T item) {
         if (size == array.length) {
-            resize(size * EXPAND_FACTOR);
+            resize(size * EXPAND_FACTOR, 0, 1);
         }
-        System.arraycopy(array, 0, array, 1, size);
         array[0] = item;
         size++;
     }
@@ -89,7 +88,7 @@ public class ArrayDeque<T> {
     /** Adds an item of type T to the back of the deque. */
     public void addLast(T item) {
         if (size == array.length) {
-            resize(size * EXPAND_FACTOR);
+            resize(size * EXPAND_FACTOR, 0, 0);
         }
         array[size] = item;
         size++;
@@ -123,8 +122,8 @@ public class ArrayDeque<T> {
         System.arraycopy(array, 1, array, 0, size - 1);
         size--;
         double usage = (double) size / (double) array.length;
-        if (usage < USAGE_FACTOR) {
-            resize(array.length / SHRINK_FACTOR);
+        if (usage < USAGE_FACTOR && array.length > MINIMUM_ARRAY_SIZE) {
+            resize(array.length / SHRINK_FACTOR, 0, 0);
         }
         return removedItem;
     }
@@ -139,8 +138,8 @@ public class ArrayDeque<T> {
         array[size - 1] = null;
         size--;
         double usage = (double) size / (double) array.length;
-        if (usage < USAGE_FACTOR) {
-            resize(array.length / SHRINK_FACTOR);
+        if (usage < USAGE_FACTOR && array.length > MINIMUM_ARRAY_SIZE) {
+            resize(array.length / SHRINK_FACTOR, 0, 0);
         }
         return removedItem;
     }
