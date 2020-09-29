@@ -114,17 +114,24 @@ public class ArrayDeque<T> {
         int newFirst = 0;
         int curIdx = getNext(nextFirst);
         int newIdx = newFirst;
-        while (curIdx != nextLast && newIdx < newItems.length) {
+        int tempSize = size;
+        while (tempSize != 0 && newIdx < newItems.length) {
             newItems[newIdx] = items[curIdx];
             curIdx = getNext(curIdx);
             newIdx += 1;
+            tempSize--;
         }
         items = newItems;
         if (length < size) {
             size = length;
         }
         nextFirst = getPrevious(newFirst);
-        nextLast = getNext(newFirst + size - 1);
+        nextLast = getNext(nextFirst);
+        tempSize = size;
+        while (tempSize != 0) {
+            nextLast = getNext(nextLast);
+            tempSize--;
+        }
     }
 
     /** Adds an item of type T to the front of the deque. */
