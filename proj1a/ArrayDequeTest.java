@@ -30,7 +30,7 @@ public class ArrayDequeTest {
     @Test
     public void testArrayDeque() {
         ArrayDeque<String> input1 = new ArrayDeque<String>();
-        int actual1 = 0;
+        int actual1 = input1.size();
         int expected1 = 0;
         assertEquals(expected1, actual1);
 
@@ -154,5 +154,38 @@ public class ArrayDequeTest {
         String actual4 = input2.removeLast();
         String expected4 = "a";
         assertEquals(expected4, actual4);
+    }
+
+    @Test
+    public void testArray() {
+        ArrayDeque<Integer> L = new ArrayDeque<Integer>();
+        L.addFirst(0);
+        Integer removed = L.removeLast();
+        L.addFirst(2);
+        removed = L.removeLast();
+        L.addFirst(4);
+        removed = L.removeLast();
+        L.addFirst(6);
+        removed = L.removeLast();
+        L.addFirst(8);
+
+        ArrayDeque<Integer> L2 = new ArrayDeque<Integer>();
+        L2.addLast(0);
+        L2.addFirst(1);
+        L2.addLast(2);
+        removed = L2.removeFirst();
+        L2.addLast(4);
+        L2.addLast(5);
+        removed = L2.removeFirst();
+        for (int i = 1; i <= 1000; i++) {
+            L.addFirst(i);
+        }
+        for (int i = 1; i <= 2000; i++) {
+            L.removeFirst();
+        }
+        System.out.println("size: " + L.size());
+        for (int i = 1; i <= 1000; i++) {
+            L.addFirst(i);
+        }
     }
 }
