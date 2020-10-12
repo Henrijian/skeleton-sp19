@@ -32,6 +32,7 @@ public class TestArrayDequeGold {
         ArrayDequeSolution<Integer> sol = new ArrayDequeSolution<>();
         StudentArrayDeque<Integer> stu = new StudentArrayDeque<>();
 
+        int lastIdx;
         Integer actual;
         Integer expected;
         String errorMsg;
@@ -42,7 +43,7 @@ public class TestArrayDequeGold {
             int value = StdRandom.uniform(valueBound);
             sol.addLast(value);
             sol.addLast(value);
-            int lastIdx = i;
+            lastIdx = i;
             expected = sol.get(lastIdx);
             actual = stu.get(lastIdx);
             errorMsg = String.format("addLast(%d)\n"+
@@ -52,9 +53,31 @@ public class TestArrayDequeGold {
         }
     }
 
+    public void testIsEmpty() {
+        StudentArrayDeque<Integer> stu = new StudentArrayDeque<>();
+
+        assertTrue("new StudentArrayDeque<>()\nisEmpty()", stu.isEmpty());
+
+        int valueBound = 10000;
+        Integer value = StdRandom.uniform(valueBound);
+        stu.addFirst(value);
+        String errorMsg = String.format("addFirst(%d)\n"+
+                                        "isEmpty()",
+                                        value);
+        assertFalse(errorMsg, stu.isEmpty());
+
+        Integer removedValue = stu.removeFirst();
+        errorMsg = String.format("addFirst(%d)\n"+
+                                 "removeFirst(): %d\n"+
+                                 "isEmpty()",
+                                 value, removedValue);
+        assertTrue(errorMsg, stu.isEmpty());
+    }
+
     @Test
     public void testStudentArrayDeque() {
         testAddFirst();
         testAddLast();
+        testIsEmpty();
     }
 }
