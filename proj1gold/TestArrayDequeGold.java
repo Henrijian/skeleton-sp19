@@ -25,7 +25,6 @@ public class TestArrayDequeGold {
         callStack.clear();
         ArrayDequeSolution<Integer> sol = new ArrayDequeSolution<>();
         StudentArrayDeque<Integer> stu = new StudentArrayDeque<>();
-        callStack.add("new StudentArrayDeque<>()");
 
         final int firstIdx = 0;
         Integer actual;
@@ -42,7 +41,7 @@ public class TestArrayDequeGold {
             callStack.add(stackMsg);
             expected = sol.get(firstIdx);
             actual = stu.get(firstIdx);
-            stackMsg = String.format("get(%d): %d", firstIdx, actual);
+            stackMsg = String.format("get(%d)", firstIdx);
             callStack.add(stackMsg);
             assertEquals(callStackMessage(), expected, actual);
         }
@@ -53,7 +52,6 @@ public class TestArrayDequeGold {
         callStack.clear();
         ArrayDequeSolution<Integer> sol = new ArrayDequeSolution<>();
         StudentArrayDeque<Integer> stu = new StudentArrayDeque<>();
-        callStack.add("new StudentArrayDeque<>()");
 
         int lastIdx;
         Integer actual;
@@ -71,7 +69,7 @@ public class TestArrayDequeGold {
             lastIdx = i;
             expected = sol.get(lastIdx);
             actual = stu.get(lastIdx);
-            stackMsg = String.format("get(%d): %d", lastIdx, actual);
+            stackMsg = String.format("get(%d)", lastIdx);
             callStack.add(stackMsg);
             assertEquals(callStackMessage(), expected, actual);
         }
@@ -86,9 +84,8 @@ public class TestArrayDequeGold {
         final int valueBound = 10000;
 
         stu = new StudentArrayDeque<>();
-        callStack.add("new StudentArrayDeque<>()");
 
-        errorMsg = String.format("isEmpty(): %b", stu.isEmpty());
+        errorMsg = "isEmpty()";
         callStack.add(errorMsg);
         assertTrue(callStackMessage(), stu.isEmpty());
 
@@ -97,15 +94,15 @@ public class TestArrayDequeGold {
         errorMsg = String.format("addFirst(%d)", value);
         callStack.add(errorMsg);
 
-        errorMsg = String.format("isEmpty(): %b", stu.isEmpty());
+        errorMsg = "isEmpty()";
         callStack.add(errorMsg);
         assertFalse(errorMsg, stu.isEmpty());
 
         Integer removedValue = stu.removeFirst();
-        errorMsg = String.format("removeFirst(): %d", removedValue);
+        errorMsg = "removeFirst()";
         callStack.add(errorMsg);
 
-        errorMsg = String.format("isEmpty(): %b", stu.isEmpty());
+        errorMsg = "isEmpty()";
         callStack.add(errorMsg);
         assertTrue(errorMsg, stu.isEmpty());
     }
@@ -122,11 +119,10 @@ public class TestArrayDequeGold {
         StudentArrayDeque<Integer> stu;
 
         stu = new StudentArrayDeque<>();
-        callStack.add("new StudentArrayDeque<>()");
 
         actualSize = stu.size();
         expectedSize = 0;
-        stackMsg = String.format("size(): %d", actualSize);
+        stackMsg = "size()";
         callStack.add(stackMsg);
         assertEquals(callStackMessage(), expectedSize, actualSize);
 
@@ -139,19 +135,19 @@ public class TestArrayDequeGold {
 
         actualSize = stu.size();
         expectedSize = size;
-        stackMsg = String.format("size(): %d", actualSize);
+        stackMsg = "size()";
         callStack.add(stackMsg);
         assertEquals(callStackMessage(), expectedSize, actualSize);
 
         for (int i = 0; i < size; i += 1) {
             Integer removedValue = stu.removeLast();
-            stackMsg = String.format("removeLast(): %d", removedValue);
+            stackMsg = "removeLast()";
             callStack.add(stackMsg);
         }
 
         actualSize = stu.size();
         expectedSize = 0;
-        stackMsg = String.format("size(): %d", actualSize);
+        stackMsg = "size()";
         callStack.add(stackMsg);
         assertEquals(callStackMessage(), expectedSize, actualSize);
 
@@ -164,19 +160,19 @@ public class TestArrayDequeGold {
 
         actualSize = stu.size();
         expectedSize = size;
-        stackMsg = String.format("size(): %d", actualSize);
+        stackMsg = "size()";
         callStack.add(stackMsg);
         assertEquals(callStackMessage(), expectedSize, actualSize);
 
         for (int i = 0; i < size; i += 1) {
             Integer removedValue = stu.removeFirst();
-            stackMsg = String.format("removeFirst(): %d", removedValue);
+            stackMsg = "removeFirst()";
             callStack.add(stackMsg);
         }
 
         actualSize = stu.size();
         expectedSize = 0;
-        stackMsg = String.format("size(): %d", actualSize);
+        stackMsg = "size()";
         callStack.add(stackMsg);
         assertEquals(callStackMessage(), expectedSize, actualSize);
     }
