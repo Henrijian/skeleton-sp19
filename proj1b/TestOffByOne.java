@@ -10,9 +10,12 @@ public class TestOffByOne {
     public void testEqualsChars() {
         assertTrue(offByOne.equalChars('a', 'b'));
         assertTrue(offByOne.equalChars('b', 'a'));
+        assertTrue(offByOne.equalChars('%', '&'));
+
         assertFalse(offByOne.equalChars('a', 'a'));
-        assertFalse(offByOne.equalChars('c', 'e'));
-        assertFalse(offByOne.equalChars('c', 'a'));
+        assertFalse(offByOne.equalChars('a', 'c'));
+        assertFalse(offByOne.equalChars('a', 'z'));
+        assertFalse(offByOne.equalChars('a', 'B'));
     }
 }
 // Uncomment this class once you've created your CharacterComparator interface and OffByOne class.
