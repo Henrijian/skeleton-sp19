@@ -77,34 +77,116 @@ public class TestArrayDequeGold {
         }
     }
 
+    /** Test isEmpty function of Deque.*/
     public void testIsEmpty() {
         callStack.clear();
-        StudentArrayDeque<Integer> stu = new StudentArrayDeque<>();
+
+        StudentArrayDeque<Integer> stu;
+        String errorMsg;
+        final int valueBound = 10000;
+
+        stu = new StudentArrayDeque<>();
         callStack.add("new StudentArrayDeque<>()");
 
-        callStack.add("isEmpty()");
+        errorMsg = String.format("isEmpty(): %b", stu.isEmpty());
+        callStack.add(errorMsg);
         assertTrue(callStackMessage(), stu.isEmpty());
 
-        int valueBound = 10000;
         Integer value = StdRandom.uniform(valueBound);
         stu.addFirst(value);
-        String errorMsg = String.format("addFirst(%d)\n"+
-                                        "isEmpty()",
-                                        value);
+        errorMsg = String.format("addFirst(%d)", value);
+        callStack.add(errorMsg);
+
+        errorMsg = String.format("isEmpty(): %b", stu.isEmpty());
+        callStack.add(errorMsg);
         assertFalse(errorMsg, stu.isEmpty());
 
         Integer removedValue = stu.removeFirst();
-        errorMsg = String.format("addFirst(%d)\n"+
-                                 "removeFirst(): %d\n"+
-                                 "isEmpty()",
-                                 value, removedValue);
+        errorMsg = String.format("removeFirst(): %d", removedValue);
+        callStack.add(errorMsg);
+
+        errorMsg = String.format("isEmpty(): %b", stu.isEmpty());
+        callStack.add(errorMsg);
         assertTrue(errorMsg, stu.isEmpty());
     }
+
+    /** Test size function of Deque.*/
+    public void testSize() {
+        callStack.clear();
+
+        final int size = 1000;
+        final int valueBound = 10000;
+        int actualSize;
+        int expectedSize;
+        String stackMsg;
+        StudentArrayDeque<Integer> stu;
+
+        stu = new StudentArrayDeque<>();
+        callStack.add("new StudentArrayDeque<>()");
+
+        actualSize = stu.size();
+        expectedSize = 0;
+        stackMsg = String.format("size(): %d", actualSize);
+        callStack.add(stackMsg);
+        assertEquals(callStackMessage(), expectedSize, actualSize);
+
+        for (int i = 0; i < size; i += 1) {
+            int value = StdRandom.uniform(valueBound);
+            stu.addLast(value);
+            stackMsg = String.format("addLast(%d)", value);
+            callStack.add(stackMsg);
+        }
+
+        actualSize = stu.size();
+        expectedSize = size;
+        stackMsg = String.format("size(): %d", actualSize);
+        callStack.add(stackMsg);
+        assertEquals(callStackMessage(), expectedSize, actualSize);
+
+        for (int i = 0; i < size; i += 1) {
+            Integer removedValue = stu.removeLast();
+            stackMsg = String.format("removeLast(): %d", removedValue);
+            callStack.add(stackMsg);
+        }
+
+        actualSize = stu.size();
+        expectedSize = 0;
+        stackMsg = String.format("size(): %d", actualSize);
+        callStack.add(stackMsg);
+        assertEquals(callStackMessage(), expectedSize, actualSize);
+
+        for (int i = 0; i < size; i += 1) {
+            int value = StdRandom.uniform(valueBound);
+            stu.addFirst(value);
+            stackMsg = String.format("addFirst(%d)", value);
+            callStack.add(stackMsg);
+        }
+
+        actualSize = stu.size();
+        expectedSize = size;
+        stackMsg = String.format("size(): %d", actualSize);
+        callStack.add(stackMsg);
+        assertEquals(callStackMessage(), expectedSize, actualSize);
+
+        for (int i = 0; i < size; i += 1) {
+            Integer removedValue = stu.removeFirst();
+            stackMsg = String.format("removeFirst(): %d", removedValue);
+            callStack.add(stackMsg);
+        }
+
+        actualSize = stu.size();
+        expectedSize = 0;
+        stackMsg = String.format("size(): %d", actualSize);
+        callStack.add(stackMsg);
+        assertEquals(callStackMessage(), expectedSize, actualSize);
+    }
+
 
     @Test
     public void testStudentArrayDeque() {
         testAddFirst();
         testAddLast();
         testIsEmpty();
+        testSize();
     }
 }
