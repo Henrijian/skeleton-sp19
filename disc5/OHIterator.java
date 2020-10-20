@@ -1,4 +1,6 @@
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 public class OHIterator implements Iterator<OHRequest> {
     OHRequest curr;
 
@@ -19,6 +21,9 @@ public class OHIterator implements Iterator<OHRequest> {
     }
     @Override
     public OHRequest next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
         OHRequest returnedOHRequest = curr;
         curr = curr.next;
         return returnedOHRequest;
