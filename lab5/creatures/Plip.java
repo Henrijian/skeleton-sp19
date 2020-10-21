@@ -6,9 +6,7 @@ import huglife.Action;
 import huglife.Occupant;
 
 import java.awt.Color;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Map;
+import java.util.*;
 
 /**
  * An implementation of a motile pacifist photosynthesizer.
@@ -41,6 +39,10 @@ public class Plip extends Creature {
     private static final double REP_ENERGY_RETAINED = 0.5;
 
     private static final double REP_ENERGY_GIVEN = 0.5;
+
+    private static final double RPE_MIN_ENERGY = 1.0;
+
+    private static final double MOVE_PROBABILITY = 0.5;
 
     /**
      * creates plip with energy equal to E.
@@ -117,6 +119,14 @@ public class Plip extends Creature {
     }
 
     /**
+     * Randomly choose the direction in emptyNeighbors.
+     */
+    private Direction randomDirection(List<Direction> directions) {
+        int randomIdx = (int)Math.random() * directions.size();
+        return directions.get(randomIdx);
+    }
+
+    /**
      * Plips take exactly the following actions based on NEIGHBORS:
      * 1. If no empty adjacent spaces, STAY.
      * 2. Otherwise, if energy >= 1, REPLICATE towards an empty direction
@@ -131,20 +141,38 @@ public class Plip extends Creature {
      */
     public Action chooseAction(Map<Direction, Occupant> neighbors) {
         // Rule 1
-        Deque<Direction> emptyNeighbors = new ArrayDeque<>();
+        List<Direction> emptyDirections = new ArrayList<>();
         boolean anyClorus = false;
-        // TODO
-        // (Google: Enhanced for-loop over keys of NEIGHBORS?)
-        // for () {...}
-
-        if (false) { // FIXME
-            // TODO
+        boolean anyEmpty = false;
+        for (Map.Entry<Direction, Occupant> neighbor: neighbors.entrySet()) {
+            Direction dir = neighbor.getKey();
+            Occupant occ = neighbor.getValue();
+            if (occ.name().equals("empty")) {
+                anyEmpty = true;
+                emptyDirections.add(dir);
+            }
+            if (occ.name().equals("clorus")) {
+                anyClorus = true;
+            }
+        }
+        if (!anyEmpty) {
+            return new Action(Action.ActionType.STAY);
         }
 
         // Rule 2
-        // HINT: randomEntry(emptyNeighbors)
+        if (energy >= RPE_MIN_ENERGY) {
+            Direction emptyDir = randomDirection(emptyDirections);
+            return new Action(Action.ActionType.REPLICATE, emptyDir);
+        }
 
         // Rule 3
+        if (anyClorus) {
+            Direction emptyDir;
+            do {
+                emptyDir = randomDirection(emptyDirections);
+            } while (Math.random() < MOVE_PROBABILITY);
+            return new Action(Action.ActionType.MOVE, emptyDir);
+        }
 
         // Rule 4
         return new Action(Action.ActionType.STAY);

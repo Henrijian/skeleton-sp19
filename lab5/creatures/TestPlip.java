@@ -40,7 +40,7 @@ public class TestPlip {
         assertEquals(1, r.energy(), 0.01);
     }
 
-    //@Test
+    @Test
     public void testChoose() {
 
         // No empty adjacent spaces; stay.
