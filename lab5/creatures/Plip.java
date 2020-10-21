@@ -38,6 +38,10 @@ public class Plip extends Creature {
 
     private static final double MIN_ENERGY = 0;
 
+    private static final double REP_ENERGY_RETAINED = 0.5;
+
+    private static final double REP_ENERGY_GIVEN = 0.5;
+
     /**
      * creates plip with energy equal to E.
      */
@@ -107,7 +111,9 @@ public class Plip extends Creature {
      * Plip.
      */
     public Plip replicate() {
-        return this;
+        Plip r = new Plip(energy * REP_ENERGY_GIVEN);
+        energy *= REP_ENERGY_RETAINED;
+        return r;
     }
 
     /**
