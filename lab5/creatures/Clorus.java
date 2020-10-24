@@ -17,8 +17,6 @@ public class Clorus extends Creature {
     /* Color of blue. */
     private int b;
 
-    private static final double MIN_ENERGY = 0;
-
     private static final double MOVE_ENERGY_CONSUMED = 0.03;
 
     private static final double STAY_ENERGY_CONSUMED = 0.01;
@@ -59,17 +57,11 @@ public class Clorus extends Creature {
     /* Whenever move action happened, lose 0.3 point of energy after action finished. */
     public void move() {
         energy -= MOVE_ENERGY_CONSUMED;
-//        if (energy < MIN_ENERGY) {
-//            energy = MIN_ENERGY;
-//        }
     }
 
     /* Whenever stay action happened, lose 0.1 point of energy after action complete. */
     public void stay() {
         energy -= STAY_ENERGY_CONSUMED;
-//        if (energy < MIN_ENERGY) {
-//            energy = MIN_ENERGY;
-//        }
     }
 
     /* Consume 50% of energy to replicate offspring, and offspring get 50% energy from mother. */

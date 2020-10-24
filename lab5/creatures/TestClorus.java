@@ -18,19 +18,19 @@ public class TestClorus {
         assertEquals(5, c.energy(), TOLERANCE);
         /* Test MOVE action. */
         c.move();
-        assertEquals(4.7, c.energy(), TOLERANCE);
+        assertEquals(4.97, c.energy(), TOLERANCE);
         /* Test STAY action. */
         c.stay();
-        assertEquals(4.6, c.energy(), TOLERANCE);
+        assertEquals(4.97, c.energy(), TOLERANCE);
         /* Test color. */
         assertEquals(new Color(34, 0, 231), c.color());
         /* Test ATTACK action. */
-        Clorus prey = new Clorus(3.4);
+        Clorus prey = new Clorus(3.03);
         c.attack(prey);
         assertEquals(8.0, c.energy(), TOLERANCE);
         /* Test REPLICATE action. */
         Clorus offspring = c.replicate();
-        assertNotEquals(c, offspring);
+        assertNotSame(c, offspring);
         assertEquals(4.0, c.energy(), TOLERANCE);
         assertEquals(4.0, offspring.energy(), TOLERANCE);
         /* Test DIE action. */
