@@ -96,7 +96,6 @@ public class Plip extends Creature {
         }
     }
 
-
     /**
      * Plips gain 0.2 energy when staying due to photosynthesis.
      */
@@ -119,7 +118,7 @@ public class Plip extends Creature {
     }
 
     /**
-     * Randomly choose the direction in emptyNeighbors.
+     * Randomly choose the direction in directions.
      */
     private Direction randomDirection(List<Direction> directions) {
         int randomIdx = (int)Math.random() * directions.size();
