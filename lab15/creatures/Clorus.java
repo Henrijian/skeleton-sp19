@@ -75,7 +75,7 @@ public class Clorus extends Creature {
      * Randomly choose the direction in directions.
      */
     private Direction randomDirection(List<Direction> directions) {
-        int randomIdx = (int)Math.random() * directions.size();
+        int randomIdx = (int)Math.floor(Math.random() * directions.size());
         return directions.get(randomIdx);
     }
 
