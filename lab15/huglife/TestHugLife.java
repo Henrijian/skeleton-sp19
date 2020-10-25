@@ -1,18 +1,13 @@
 package huglife;
-
 import org.junit.Test;
-
 import static org.junit.Assert.*;
 
-/**
- * Performs basic tests of huglife package.
- *
- * @author Josh Hug
+/** Performs basic tests of huglife package.
+ *  @author Josh Hug
  */
 
 public class TestHugLife {
-    /**
-     * Performs basic tests of huglife package.
+    /** Performs basic tests of huglife package.
      */
 
     @Test
@@ -29,6 +24,6 @@ public class TestHugLife {
     }
 
     public static void main(String[] args) {
-        jh61b.junit.textui.runClasses(TestHugLife.class);
+        jh61b.junit.textui.runClasses(TestHugLife.class);   
     }
 } 

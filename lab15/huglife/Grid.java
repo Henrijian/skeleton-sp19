@@ -5,43 +5,30 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Primary class for simulation of a HugLife world.
- * <p>
- * Only intended for use by the HugLife class (or something similar).
+/** Primary class for simulation of a HugLife world.
  *
- * @author Josh Hug
+ *  Only intended for use by the HugLife class (or something similar).
+ *  @author Josh Hug
  */
 public class Grid {
-    /**
-     * Size of the grid
-     */
+    /** Size of the grid */
     private int N;
-    /**
-     * Total living population of the world
-     */
+    /** Total living population of the world */
     private int population;
-    /**
-     * 2D grid of all the occupants
-     */
+    /** 2D grid of all the occupants */
     private Occupant[][] occupants;
-    /**
-     * Not the most efficient data structure! We'll end up spending
+    /** Not the most efficient data structure! We'll end up spending
      * a linear amount of time scanning through this queue, when
      * we could get this done essentially for free. Maybe I'll
      * fix this later, but I don't think it's a performance bottleneck.
      */
     private Queue<Position> moveQueue;
 
-    /**
-     * dummy position used to track when an entire cycle has been completed
-     */
+    /** dummy position used to track when an entire cycle has been completed */
     private static final Position sentinel = new Position(-23, -23);
 
 
-    /**
-     * Creates a grid of size N
-     */
+    /** Creates a grid of size N */
     public Grid(int N) {
         this.N = N;
         population = 0;
@@ -56,9 +43,7 @@ public class Grid {
 
     }
 
-    /**
-     * Returns true if X and Y are in bounds
-     */
+    /** Returns true if X and Y are in bounds */
     private boolean inBounds(int x, int y) {
         if (x < 0 || y < 0 || x >= N || y >= N) {
             return false;
@@ -66,26 +51,20 @@ public class Grid {
         return true;
     }
 
-    /**
-     * Returns true if X, Y is empty
-     */
+    /** Returns true if X, Y is empty */
     private boolean isEmpty(int x, int y) {
         return getOccupant(x, y).name.equals("empty");
     }
 
-    /**
-     * Returns true if X and Y contains a living thing,
-     * i.e. if the contents are anything other than empty
-     * or impassible. Wowza, actually useful instanceof!
-     */
+    /** Returns true if X and Y contains a living thing,
+        i.e. if the contents are anything other than empty
+        or impassible. Wowza, actually useful instanceof!  */
     private boolean isCreature(int x, int y) {
         Occupant o = getOccupant(x, y);
         return o instanceof Creature;
     }
 
-    /**
-     * Returns occupant of X and Y
-     */
+    /** Returns occupant of X and Y */
     private Occupant getOccupant(int x, int y) {
 
         if (inBounds(x, y)) {
@@ -95,29 +74,25 @@ public class Grid {
         return new Impassible();
     }
 
-    /**
-     * Returns creature in position X and Y. If there is
-     * no creature at position x, y, an exception is thrown.
-     */
+    /** Returns creature in position X and Y. If there is
+        no creature at position x, y, an exception is thrown.  */
     private Creature getCreature(int x, int y) {
         creatureCheck(x, y);
         return (Creature) getOccupant(x, y);
     }
 
-    /**
-     * creates a new member of the world and puts at end of queue.
-     * creation means:
-     * 1. increase population
-     * 2. add to grid
-     * 3. add to deque
-     */
+    /** creates a new member of the world and puts at end of queue.
+        creation means:
+        1. increase population
+        2. add to grid
+        3. add to deque */
     void createCreature(int x, int y, Creature c) {
         if (!isEmpty(x, y)) {
             Occupant oldOccupant = getOccupant(x, y);
             throw new IllegalArgumentException(
-                    String.format("Tried to place a %s at (%d, %d), but "
-                                    + " space is already occupied by a %s.", c.name,
-                            x, y, oldOccupant));
+                      String.format("Tried to place a %s at (%d, %d), but "
+                       + " space is already occupied by a %s.", c.name,
+                       x, y, oldOccupant));
         }
 
         population += 1;
@@ -126,18 +101,16 @@ public class Grid {
         getInLine(x, y);
     }
 
-    /**
-     * destroys creature in position x, y
-     * destruction means:
-     * 1. reduce population
-     * 2. remove from grid
-     * 3. remove from deque
-     */
+    /** destroys creature in position x, y
+        destruction means:
+        1. reduce population
+        2. remove from grid
+        3. remove from deque */
     void destroyCreature(int x, int y) {
         if (!isCreature(x, y)) {
             throw new IllegalArgumentException(
-                    String.format("Tried to destroy a creature at (%d, %d), but " +
-                            "no creature at this position.", x, y));
+                      String.format("Tried to destroy a creature at (%d, %d), but " +
+                             "no creature at this position.", x, y));
         }
 
         population -= 1;
@@ -145,49 +118,41 @@ public class Grid {
         removeFromQueue(x, y);
     }
 
-    /**
-     * Places occupant O in position X and Y, throwing an
-     * exception if the space is not empty.
-     */
+    /** Places occupant O in position X and Y, throwing an
+        exception if the space is not empty.  */
 
     void placeOccupant(int x, int y, Occupant o) {
         if (!isEmpty(x, y)) {
             Occupant oldOccupant = getOccupant(x, y);
             throw new IllegalArgumentException(
-                    String.format("Tried to place a %s at (%d, %d), but "
-                                    + " space is already occupied by a %s.", o.name,
-                            x, y, oldOccupant));
+                      String.format("Tried to place a %s at (%d, %d), but "
+                       + " space is already occupied by a %s.", o.name,
+                       x, y, oldOccupant));
         }
 
         occupants[y][x] = o;
     }
 
 
-    /**
-     * removes occupant, does not affect population or dequeue
-     */
+    /** removes occupant, does not affect population or dequeue */
     private void removeOccupant(int x, int y) {
         if (isEmpty(x, y) || !inBounds(x, y)) {
             throw new IllegalArgumentException(
-                    String.format("Tried to remove (%d, %d), but "
-                            + " space is empty or out of bounds.", x, y));
+                      String.format("Tried to remove (%d, %d), but "
+                       + " space is empty or out of bounds.", x, y));
         }
 
         occupants[y][x] = new Empty();
     }
 
-    /**
-     * True if any life exists.
-     */
+    /** True if any life exists. */
     private boolean lifeExists() {
         return population > 0;
     }
 
 
-    /**
-     * Returns the TOP, BOTTOM, LEFT, and RGIHT neighbors
-     * of position X and Y
-     */
+    /** Returns the TOP, BOTTOM, LEFT, and RGIHT neighbors
+      * of position X and Y */
 
     public Map<Direction, Occupant> neighbors(int x, int y) {
         HashMap<Direction, Occupant> neighbors =
@@ -206,11 +171,10 @@ public class Grid {
     }
 
 
-    /**
-     * Redraw entire world (slow!).
-     * <p>
-     * In a better simulator, we'd only redraw the things
-     * we really needed to redraw.
+    /** Redraw entire world (slow!).
+     *
+     *  In a better simulator, we'd only redraw the things
+     *  we really needed to redraw.
      */
     public void drawWorld() {
         StdDraw.clear();
@@ -230,13 +194,12 @@ public class Grid {
 
     /**
      * Writes the world to a .world file
-     *
      * @param worldName name fo the world that is being written
      */
     public void writeWorld(String worldName) {
         Out out = new Out("huglife/" + worldName + ".world");
         for (int j = N; j >= 0; j--) {
-            for (int i = 0; i < N; i++) {
+             for (int i = 0; i < N; i++) {
                 Occupant o = getOccupant(i, j);
                 out.println(o.name + " " + i + " " + j);
             }
@@ -244,9 +207,8 @@ public class Grid {
         }
     }
 
-    /**
-     * Gives the x, y coordinates if we go in direction of action A from
-     * position X, Y
+    /** Gives the x, y coordinates if we go in direction of action A from
+     *  position X, Y
      */
 
     private static Position targetPosition(int x, int y, Action a) {
@@ -267,12 +229,10 @@ public class Grid {
     }
 
 
-    /**
-     * Remove position X, Y from the move queue.
-     * <p>
-     * Permit removal even if something is not in the queue.
-     * This can happen because a creature just chose the die action
-     */
+    /**  Remove position X, Y from the move queue.
+      *
+      *  Permit removal even if something is not in the queue.
+      *  This can happen because a creature just chose the die action */
     private void removeFromQueue(int x, int y) {
         Position p = new Position(x, y);
         if (moveQueue.contains(p)) {
@@ -280,24 +240,22 @@ public class Grid {
         }
     }
 
-    /**
-     * Puts position X, Y into the move queue.
-     */
+    /** Puts position X, Y into the move queue. */
     private void getInLine(int x, int y) {
         Position p = new Position(x, y);
         if (!isCreature(x, y)) {
 
             String msg = String.format("Tried to add creature at (%d, %d) to " +
-                            "the move queue, but no creature exists at that spot.",
-                    x, y);
+                         "the move queue, but no creature exists at that spot.",
+                         x, y);
 
             throw new IllegalArgumentException(msg);
         }
 
         if (moveQueue.contains(p)) {
             String msg = String.format("Tried to add creature at (%d, %d) to " +
-                            "the move queue, but creature is already in line.",
-                    x, y);
+                         "the move queue, but creature is already in line.",
+                         x, y);
 
             throw new IllegalArgumentException(msg);
 
@@ -306,9 +264,7 @@ public class Grid {
         moveQueue.add(p);
     }
 
-    /**
-     * Peforms a move action from X, Y to TX, TY.
-     */
+    /** Peforms a move action from X, Y to TX, TY. */
     void doMove(int x, int y, int tx, int ty) {
         Creature from = getCreature(x, y);
         Occupant to = getOccupant(tx, ty);
@@ -323,9 +279,7 @@ public class Grid {
         getInLine(tx, ty);
     }
 
-    /**
-     * Perform the replicate action from X, Y to TX, TY
-     */
+    /** Perform the replicate action from X, Y to TX, TY */
     void doReplicate(int x, int y, int tx, int ty) {
         Creature from = getCreature(x, y);
         Occupant to = getOccupant(tx, ty);
@@ -339,19 +293,15 @@ public class Grid {
         getInLine(x, y);
     }
 
-    /**
-     * Kills off creature in position X, Y, replacing it with
-     * an empty square.
-     */
+    /** Kills off creature in position X, Y, replacing it with
+        an empty square. */
     void doDie(int x, int y) {
         destroyCreature(x, y);
     }
 
-    /**
-     * Creature in X, Y takes TX, TY's place. Tx, ty
-     * is removed from the board. Attacks always succeed.
-     * Attacks on empty squares are forbidden.
-     */
+    /** Creature in X, Y takes TX, TY's place. Tx, ty
+        is removed from the board. Attacks always succeed.
+        Attacks on empty squares are forbidden. */
     void doAttack(int x, int y, int tx, int ty) {
         creatureCheck(x, y, "attack");
         creatureCheck(tx, ty, "attack");
@@ -367,9 +317,7 @@ public class Grid {
         getInLine(tx, ty);
     }
 
-    /**
-     * Performs the stay action in position X, Y
-     */
+    /** Performs the stay action in position X, Y */
     void doStay(int x, int y) {
         Creature c = getCreature(x, y);
 
@@ -377,8 +325,7 @@ public class Grid {
         getInLine(x, y);
     }
 
-    /**
-     * Handles action A in position X, Y.
+    /** Handles action A in position X, Y.
      */
     void handleAction(int x, int y, Action a) {
         Position p = targetPosition(x, y, a);
@@ -408,11 +355,10 @@ public class Grid {
     }
 
 
-    /**
-     * Requests an action from the creature in position x, y.
-     * The weird cast is so we can throw a more useful message to
-     * the user if something goes wrong, e.g. we ask an empty
-     * square for an action.
+    /** Requests an action from the creature in position x, y.
+     *  The weird cast is so we can throw a more useful message to
+     *  the user if something goes wrong, e.g. we ask an empty
+     *  square for an action.
      */
     Action requestAction(int x, int y) {
         creatureCheck(x, y, "requestAction");
@@ -425,9 +371,8 @@ public class Grid {
         return c.chooseAction(nbot);
     }
 
-    /**
-     * Perform one tic of the simulation. Returns true if
-     * this tic was the completion of a cycle;
+    /** Perform one tic of the simulation. Returns true if
+     *  this tic was the completion of a cycle;
      */
     public boolean tic() {
         if (lifeExists()) {
@@ -448,9 +393,8 @@ public class Grid {
     }
 
 
-    /**
-     * Checks that a move from X, Y to TX, TY is valid, where
-     * MOVESTR is the type of move, printed for debugging reasons.
+    /** Checks that a move from X, Y to TX, TY is valid, where
+     *  MOVESTR is the type of move, printed for debugging reasons.
      */
 
     private void collisionCheck(int x, int y, int tx, int ty,
@@ -461,47 +405,44 @@ public class Grid {
         if (!isEmpty(tx, ty)) {
 
             String msg = String.format("%s tried to %s from " +
-                            "(%d, %d) to (%d, %d) already occupied by %s.",
-                    from.name(), moveStr, x, y, tx, ty, to.name());
+                         "(%d, %d) to (%d, %d) already occupied by %s.",
+                         from.name(), moveStr, x, y, tx, ty, to.name());
 
             throw new IllegalArgumentException(msg);
         }
     }
 
 
-    /**
-     * Checks that a creature exists at position X, Y, where
-     * ACTIONSTR is the type of action, printed for debugging reasons.
+    /** Checks that a creature exists at position X, Y, where
+     *  ACTIONSTR is the type of action, printed for debugging reasons.
      */
     private void creatureCheck(int x, int y, String actionStr) {
         if (!isCreature(x, y)) {
 
             String msg = String.format("Something tried to %s at " +
-                            "(%d, %d), but no creature exists at that spot.",
-                    actionStr, x, y);
+                         "(%d, %d), but no creature exists at that spot.",
+                         actionStr, x, y);
 
             throw new IllegalArgumentException(msg);
         }
     }
 
-    /**
-     * Checks that a creature exists at position X, Y.
+    /** Checks that a creature exists at position X, Y.
      */
 
     private void creatureCheck(int x, int y) {
         if (!isCreature(x, y)) {
 
             String msg = String.format("Tried to get creature from " +
-                            "(%d, %d), but no creature exists at that spot.",
-                    x, y);
+                         "(%d, %d), but no creature exists at that spot.",
+                         x, y);
 
             throw new IllegalArgumentException(msg);
         }
     }
 
-    /**
-     * Method Used only for debugging.
-     * Asserts that the queue matches the world state.
+    /** Method Used only for debugging.
+     *  Asserts that the queue matches the world state.
      */
     private void assertQueueCorrect() {
         for (int x = 0; x < N; x++) {
@@ -510,7 +451,7 @@ public class Grid {
                 Occupant o = getOccupant(x, y);
                 if ((o instanceof Creature) && (!moveQueue.contains(p))) {
                     throw new Error(String.format(
-                            "(%d, %d) is missing from moveQueue", x, y));
+                          "(%d, %d) is missing from moveQueue", x, y));
                 }
             }
         }
