@@ -1,37 +1,34 @@
 package creatures;
-
-import huglife.*;
+import huglife.Action;
+import huglife.Creature;
+import huglife.Direction;
+import huglife.Occupant;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * An implementation of a motile pacifist photosynthesizer.
- *
- * @author Jacky
- */
-
 public class Clorus extends Creature {
-
-    double repEnergyRetained = 0.5;
-    /**
-     * red color.
-     */
+    /* Color of red. */
     private int r;
-    /**
-     * green color.
-     */
+    /* Color of green. */
     private int g;
-    /**
-     * blue color.
-     */
+    /* Color of blue. */
     private int b;
-    private double moveProbability = 0.5;
 
-    /**
-     * creates plip with energy equal to E.
-     */
+    private static final double MOVE_ENERGY_CONSUMED = 0.03;
+
+    private static final double STAY_ENERGY_CONSUMED = 0.01;
+
+    private static final double REP_ENERGY_RETAINED = 0.5;
+
+    private static final double REP_ENERGY_GIVEN = 0.5;
+
+    private static final double RPE_MIN_ENERGY = 1.0;
+
+
+    /* Initiate Clorus with energy e. */
     public Clorus(double e) {
         super("clorus");
         r = 0;
@@ -40,91 +37,87 @@ public class Clorus extends Creature {
         energy = e;
     }
 
-    /**
-     * creates a plip with energy equal to 1.
-     */
     public Clorus() {
         this(1);
     }
 
-    /**
-     * Should return a color with red = 99, blue = 76, and green that varies
-     * linearly based on the energy of the Plip. If the plip has zero energy,
-     * it should have a green value of 63. If it has max energy, it should
-     * have a green value of 255. The green value should vary with energy
-     * linearly in between these two extremes. It's not absolutely vital
-     * that you get this exactly correct.
-     */
+    /* Clorus always stay on color in rgb color, where red = 34, green = 0, and blue = 231. */
     public Color color() {
         r = 34;
         g = 0;
         b = 231;
-        return color(r, g, b);
+        return new Color(r, g, b);
     }
 
-    /**
-     * Do nothing with C, Plips are pacifists.
-     */
-    public void attack(Creature c) {
-        energy += c.energy();
+    /* Get energy from attacked creature. */
+    public void attack(Creature other) {
+        energy += other.energy();
     }
 
-    /**
-     * Plips should lose 0.15 units of energy when moving. If you want to
-     * to avoid the magic number warning, you'll need to make a
-     * private static final variable. This is not required for this lab.
-     */
+    /* Whenever move action happened, lose 0.3 point of energy after action finished. */
     public void move() {
-        energy -= 0.03;
+        energy -= MOVE_ENERGY_CONSUMED;
     }
 
-
-    /**
-     * Plips gain 0.2 energy when staying due to photosynthesis.
-     */
+    /* Whenever stay action happened, lose 0.1 point of energy after action complete. */
     public void stay() {
-        energy -= 0.01;
+        energy -= STAY_ENERGY_CONSUMED;
+    }
+
+    /* Consume 50% of energy to replicate offspring, and offspring get 50% energy from mother. */
+    public Clorus replicate() {
+        Clorus r = new Clorus(energy * REP_ENERGY_GIVEN);
+        energy *= REP_ENERGY_RETAINED;
+        return r;
     }
 
     /**
-     * Plips and their offspring each get 50% of the energy, with none
-     * lost to the process. Now that's efficiency! Returns a baby
-     * Plip.
+     * Randomly choose the direction in directions.
      */
-    public Clorus replicate() {
-        /** fraction of energy to retain when replicating. */
-        energy = energy * repEnergyRetained;
-        /** fraction of energy to bestow upon offspring. */
-        double babyEnergy = energy;
-        return new Clorus(babyEnergy);
+    private Direction randomDirection(List<Direction> directions) {
+        int randomIdx = (int)Math.floor(Math.random() * directions.size());
+        return directions.get(randomIdx);
     }
 
     /**
      * Plips take exactly the following actions based on NEIGHBORS:
      * 1. If no empty adjacent spaces, STAY.
-     * 2. Otherwise, if energy >= 1, REPLICATE.
-     * 3. Otherwise, if any Cloruses, MOVE with 50% probability.
-     * 4. Otherwise, if nothing else, STAY
-     * <p>
-     * Returns an object of type Action. See Action.java for the
-     * scoop on how Actions work. See SampleCreature.chooseAction()
-     * for an example to follow.
+     * 2. Otherwise, if any Plips are seen, the Clorus will ATTACK one of them randomly.
+     * 3. Otherwise, if the Clorus has energy greater than or equal to one,
+     * it will REPLICATE to a random empty square.
+     * 4. Otherwise, the Clorus will MOVE to a random empty square.
      */
     public Action chooseAction(Map<Direction, Occupant> neighbors) {
-        List<Direction> empties = getNeighborsOfType(neighbors, "empty");
-        List<Direction> plips = getNeighborsOfType(neighbors, "plip");
-        if (empties.size() >= 1) {
-            Direction dir = HugLifeUtils.randomEntry(empties);
-            if (plips.size() >= 1) {
-                Direction attackDir = HugLifeUtils.randomEntry(plips);
-                return new Action(Action.ActionType.ATTACK, attackDir);
-            } else if (energy >= 1) {
-                return new Action(Action.ActionType.REPLICATE, dir);
-            } else {
-                return new Action(Action.ActionType.MOVE, dir);
+        // Rule 1
+        List<Direction> emptyDirections = new ArrayList<>();
+        List<Direction> plipDirections = new ArrayList<>();
+        for (Map.Entry<Direction, Occupant> neighbor: neighbors.entrySet()) {
+            Direction dir = neighbor.getKey();
+            Occupant occ = neighbor.getValue();
+            if (occ.name().equals("empty")) {
+                emptyDirections.add(dir);
+            }
+            if (occ.name().equals("plip")) {
+                plipDirections.add(dir);
             }
         }
-        return new Action(Action.ActionType.STAY);
+        if (emptyDirections.size() == 0) {
+            return new Action(Action.ActionType.STAY);
+        }
+
+        // Rule2
+        if (plipDirections.size() > 0) {
+            Direction plipDir = randomDirection(plipDirections);
+            return new Action(Action.ActionType.ATTACK, plipDir);
+        }
+
+        // Rule3
+        if (energy >= RPE_MIN_ENERGY) {
+            Direction repDir = randomDirection(emptyDirections);
+            return new Action(Action.ActionType.REPLICATE, repDir);
+        }
+
+        Direction moveDir = randomDirection(emptyDirections);
+        return new Action(Action.ActionType.MOVE, moveDir);
     }
 }
-

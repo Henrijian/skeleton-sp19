@@ -1,10 +1,12 @@
 package creatures;
 
-import huglife.*;
+import huglife.Creature;
+import huglife.Direction;
+import huglife.Action;
+import huglife.Occupant;
 
-import java.awt.*;
-import java.util.List;
-import java.util.Map;
+import java.awt.Color;
+import java.util.*;
 
 /**
  * An implementation of a motile pacifist photosynthesizer.
@@ -13,7 +15,6 @@ import java.util.Map;
  */
 public class Plip extends Creature {
 
-    double repEnergyRetained = 0.5;
     /**
      * red color.
      */
@@ -26,7 +27,22 @@ public class Plip extends Creature {
      * blue color.
      */
     private int b;
-    private double moveProbability = 0.5;
+
+    private static final double MOVE_ENERGY_CONSUMED = 0.15;
+
+    private static final double STAY_ENERGY_GAIN = 0.2;
+
+    private static final double MAX_ENERGY = 2;
+
+    private static final double MIN_ENERGY = 0;
+
+    private static final double REP_ENERGY_RETAINED = 0.5;
+
+    private static final double REP_ENERGY_GIVEN = 0.5;
+
+    private static final double RPE_MIN_ENERGY = 1.0;
+
+    private static final double MOVE_PROBABILITY = 0.5;
 
     /**
      * creates plip with energy equal to E.
@@ -56,7 +72,7 @@ public class Plip extends Creature {
      */
     public Color color() {
         r = 99;
-        g = (int) (96 * energy + 63);
+        g = (int)energy * 96 + 63;
         b = 76;
         return color(r, g, b);
     }
@@ -65,6 +81,7 @@ public class Plip extends Creature {
      * Do nothing with C, Plips are pacifists.
      */
     public void attack(Creature c) {
+        // do nothing.
     }
 
     /**
@@ -73,16 +90,20 @@ public class Plip extends Creature {
      * private static final variable. This is not required for this lab.
      */
     public void move() {
-        energy -= 0.15;
+        energy -= MOVE_ENERGY_CONSUMED;
+        if (energy < MIN_ENERGY) {
+            energy = MIN_ENERGY;
+        }
     }
-
 
     /**
      * Plips gain 0.2 energy when staying due to photosynthesis.
      */
     public void stay() {
-        energy += 0.2;
-        energy = Math.min(energy, 2);
+        energy += STAY_ENERGY_GAIN;
+        if (energy > MAX_ENERGY) {
+            energy = MAX_ENERGY;
+        }
     }
 
     /**
@@ -91,18 +112,26 @@ public class Plip extends Creature {
      * Plip.
      */
     public Plip replicate() {
-        /** fraction of energy to retain when replicating. */
-        energy = energy * repEnergyRetained;
-        /** fraction of energy to bestow upon offspring. */
-        double babyEnergy = energy;
-        return new Plip(babyEnergy);
+        Plip r = new Plip(energy * REP_ENERGY_GIVEN);
+        energy *= REP_ENERGY_RETAINED;
+        return r;
+    }
+
+    /**
+     * Randomly choose the direction in directions.
+     */
+    private Direction randomDirection(List<Direction> directions) {
+        int randomIdx = (int)Math.floor(Math.random() * directions.size());
+        return directions.get(randomIdx);
     }
 
     /**
      * Plips take exactly the following actions based on NEIGHBORS:
      * 1. If no empty adjacent spaces, STAY.
-     * 2. Otherwise, if energy >= 1, REPLICATE.
-     * 3. Otherwise, if any Cloruses, MOVE with 50% probability.
+     * 2. Otherwise, if energy >= 1, REPLICATE towards an empty direction
+     * chosen at random.
+     * 3. Otherwise, if any Cloruses, MOVE with 50% probability,
+     * towards an empty direction chosen at random.
      * 4. Otherwise, if nothing else, STAY
      * <p>
      * Returns an object of type Action. See Action.java for the
@@ -110,19 +139,41 @@ public class Plip extends Creature {
      * for an example to follow.
      */
     public Action chooseAction(Map<Direction, Occupant> neighbors) {
-        List<Direction> empties = getNeighborsOfType(neighbors, "empty");
-        List<Direction> cloruses = getNeighborsOfType(neighbors, "clorus");
-        if (empties.size() >= 1) {
-            Direction dir = HugLifeUtils.randomEntry(empties);
-            if (energy > 1.0) {
-                return new Action(Action.ActionType.REPLICATE, dir);
-            } else if (cloruses.size() >= 1) {
-                if (HugLifeUtils.random() < moveProbability) {
-                    return new Action(Action.ActionType.MOVE, dir);
-                }
+        // Rule 1
+        List<Direction> emptyDirections = new ArrayList<>();
+        boolean anyClorus = false;
+        boolean anyEmpty = false;
+        for (Map.Entry<Direction, Occupant> neighbor: neighbors.entrySet()) {
+            Direction dir = neighbor.getKey();
+            Occupant occ = neighbor.getValue();
+            if (occ.name().equals("empty")) {
+                anyEmpty = true;
+                emptyDirections.add(dir);
+            }
+            if (occ.name().equals("clorus")) {
+                anyClorus = true;
             }
         }
+        if (!anyEmpty) {
+            return new Action(Action.ActionType.STAY);
+        }
+
+        // Rule 2
+        if (energy >= RPE_MIN_ENERGY) {
+            Direction emptyDir = randomDirection(emptyDirections);
+            return new Action(Action.ActionType.REPLICATE, emptyDir);
+        }
+
+        // Rule 3
+        if (anyClorus) {
+            Direction emptyDir;
+            do {
+                emptyDir = randomDirection(emptyDirections);
+            } while (Math.random() < MOVE_PROBABILITY);
+            return new Action(Action.ActionType.MOVE, emptyDir);
+        }
+
+        // Rule 4
         return new Action(Action.ActionType.STAY);
     }
-
 }
