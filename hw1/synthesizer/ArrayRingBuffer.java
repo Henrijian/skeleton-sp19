@@ -13,16 +13,11 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
      * Create a new ArrayRingBuffer with the given capacity.
      */
     public ArrayRingBuffer(int capacity) {
-        rb = (T[]) (new Object[capacity]);
-        first = 0;
-        last = 0;
-        fillCount = 0;
-    }
-
-    /** return size of the buffer. */
-    @Override
-    public int capacity() {
-        return rb.length;
+        this.rb = (T[]) (new Object[capacity]);
+        this.first = 0;
+        this.last = 0;
+        this.fillCount = 0;
+        this.capacity = capacity;
     }
 
     /**
@@ -76,7 +71,7 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
     private class MyIterator implements Iterator<T> {
         private int curr;
 
-        public MyIterator() {
+        MyIterator() {
             curr = first;
         }
 
@@ -99,29 +94,5 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
     @Override
     public Iterator<T> iterator() {
         return new MyIterator();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        }
-        if (o.getClass() == this.getClass()) {
-            return false;
-        }
-        ArrayRingBuffer<T> other = (ArrayRingBuffer<T>) o;
-        if (other.fillCount() != this.fillCount()) {
-            return false;
-        }
-        Iterator<T> otherIterator = other.iterator();
-        Iterator<T> myIterator = this.iterator();
-        for (int i = 0; i < this.fillCount(); i++) {
-            T otherItem = otherIterator.next();
-            T myItem = myIterator.next();
-            if (!otherItem.equals(myItem)) {
-                return false;
-            }
-        }
-        return true;
     }
 }
