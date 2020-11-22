@@ -125,7 +125,7 @@ public class ArrayRingBuffer<T> implements BoundedQueue<T>  {
         for (int i = 0; i < this.fillCount(); i++) {
             T otherItem = otherIterator.next();
             T myItem = myIterator.next();
-            if (!other.equals(myItem)) {
+            if (!otherItem.equals(myItem)) {
                 return false;
             }
         }
