@@ -36,10 +36,10 @@ public class Percolation {
         if (row < 0 || side <= row || col < 0 || side <= col) {
             throw new java.lang.IndexOutOfBoundsException();
         }
-        if (isOpen(row, col)) {
+        int siteIndex = row * side + col;
+        if (grid[siteIndex] == OPENED) {
             return;
         }
-        int siteIndex = row * side + col;
         this.grid[siteIndex] = OPENED;
         int[] aroundSiteIndices;
         if (col % side == side - 1) {
@@ -90,9 +90,10 @@ public class Percolation {
 
     /** does the system percolate? */
     public boolean percolates() {
-        int lastRow = side - 1;
-        for (int col = 0; col < side; col++) {
-            if (isFull(lastRow, col)) {
+        int fullRoot = openSiteSets.find(grid.length);
+        for (int bottomIdx = grid.length - side; bottomIdx < grid.length; bottomIdx++) {
+            int bottomRoot = openSiteSets.find(bottomIdx);
+            if (fullRoot == bottomRoot) {
                 return true;
             }
         }
