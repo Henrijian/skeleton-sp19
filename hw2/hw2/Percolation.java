@@ -10,6 +10,10 @@ public class Percolation {
     private int[] grid;
     /** Length of side of grid of square. */
     private int side;
+    /** Index in top set. (index = side * side) */
+    private int topIdx;
+    /** Index in bottom set. (index = side * side + 1)*/
+    private int bottomIdx;
     /** Sets of open cell, last index for the root of full sites. */
     private WeightedQuickUnionUF openSiteSets;
     /** Number of opened cell. */
@@ -26,10 +30,13 @@ public class Percolation {
             grid[i] = UNOPENED;
         }
         this.side = N;
-        this.openSiteSets = new WeightedQuickUnionUF(siteCount + 1);
-        int fullRoot = siteCount;
-        for (int topSiteIdx = 0; topSiteIdx < side; topSiteIdx++) {
-            openSiteSets.union(topSiteIdx, fullRoot);
+        this.topIdx = siteCount;
+        this.bottomIdx = siteCount + 1;
+        // 1 for top index, the other for bottom index.
+        this.openSiteSets = new WeightedQuickUnionUF(siteCount + 2);
+        for (int i = 0; i < side; i++) {
+            openSiteSets.union(i, this.topIdx);
+            openSiteSets.union(siteCount - side + i, this.bottomIdx);
         }
         this.openSiteCount = 0;
     }
@@ -79,7 +86,7 @@ public class Percolation {
             throw new java.lang.IndexOutOfBoundsException();
         }
         int siteIndex = row * side + col;
-        return openSiteSets.connected(siteIndex, grid.length);
+        return openSiteSets.connected(siteIndex, this.topIdx);
     }
 
     /** number of open sites */
@@ -89,12 +96,7 @@ public class Percolation {
 
     /** does the system percolate? */
     public boolean percolates() {
-        for (int bottomIdx = grid.length - side; bottomIdx < grid.length; bottomIdx++) {
-            if (openSiteSets.connected(bottomIdx, grid.length)) {
-                return true;
-            }
-        }
-        return false;
+        return openSiteSets.connected(this.topIdx, this.bottomIdx);
     }
 
     /** use for unit testing (not required, but keep this here for the autograder) */
