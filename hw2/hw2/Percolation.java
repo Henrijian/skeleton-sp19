@@ -1,7 +1,6 @@
 package hw2;
 
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
-import edu.princeton.cs.algs4.QuickFindUF;
 
 public class Percolation {
     private final int UNOPENED = 0;
@@ -47,7 +46,8 @@ public class Percolation {
         } else if (col % side == 0) {
             aroundSiteIndices = new int[]{siteIndex - side, siteIndex + 1, siteIndex + side};
         } else {
-            aroundSiteIndices = new int[]{siteIndex - 1, siteIndex - side, siteIndex + 1, siteIndex + side};
+            aroundSiteIndices = new int[]{siteIndex - 1, siteIndex - side, siteIndex + 1,
+                siteIndex + side};
         }
         for (int aroundSiteIndex: aroundSiteIndices) {
             if (aroundSiteIndex < 0 || grid.length <= aroundSiteIndex) {

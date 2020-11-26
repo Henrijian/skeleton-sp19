@@ -1,7 +1,6 @@
 package hw2;
 import edu.princeton.cs.introcs.StdRandom;
 import edu.princeton.cs.introcs.StdStats;
-import edu.princeton.cs.introcs.Stopwatch;
 
 public class PercolationStats {
     /** Sequence of percolation threshold of every experiment. */
@@ -10,7 +9,8 @@ public class PercolationStats {
     /** perform T independent experiments on an N-by-N grid. */
     public PercolationStats(int N, int T, PercolationFactory pf) {
         if (N <= 0 || T <= 0) {
-            throw new java.lang.IllegalArgumentException("N and T for PercolationStats must be positive.");
+            throw new java.lang.IllegalArgumentException(
+                "N and T for PercolationStats must be positive.");
         }
 
         this.percolationThresholdArray = new double[T];
@@ -23,7 +23,7 @@ public class PercolationStats {
                 int col = StdRandom.uniform(N);
                 percolation.open(row, col);
             }
-            percolationThresholdArray[i] = (double)percolation.numberOfOpenSites() / sitesCount;
+            percolationThresholdArray[i] = (double) percolation.numberOfOpenSites() / sitesCount;
         }
     }
 
