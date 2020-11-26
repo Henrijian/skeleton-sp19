@@ -66,12 +66,15 @@ public class Percolation {
         if (siteIndex < side) {
             openSiteSets.union(fullIdx, siteIndex);
         }
+        openSiteCount += 1;
         if (!percolated) {
-            if (grid.length - side <= siteIndex && siteIndex < grid.length) {
-                percolated = openSiteSets.connected(siteIndex, fullIdx);
+            for (int bottomIdx = grid.length - side; bottomIdx < grid.length; bottomIdx++) {
+                if (openSiteSets.connected(bottomIdx, fullIdx)) {
+                    percolated = true;
+                    break;
+                }
             }
         }
-        openSiteCount += 1;
     }
 
     /** is the site (row, col) open? */
