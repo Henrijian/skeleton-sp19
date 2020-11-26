@@ -27,6 +27,10 @@ public class Percolation {
         }
         this.side = N;
         this.openSiteSets = new WeightedQuickUnionUF(siteCount + 1);
+        int fullRoot = siteCount;
+        for (int topSiteIdx = 0; topSiteIdx < side; topSiteIdx++) {
+            openSiteSets.union(topSiteIdx, fullRoot);
+        }
         this.openSiteCount = 0;
     }
 
@@ -57,9 +61,6 @@ public class Percolation {
                 openSiteSets.union(aroundSiteIndex, siteIndex);
             }
         }
-        if (siteIndex < side) {
-            openSiteSets.union(siteIndex, grid.length);
-        }
         openSiteCount += 1;
     }
 
@@ -78,9 +79,7 @@ public class Percolation {
             throw new java.lang.IndexOutOfBoundsException();
         }
         int siteIndex = row * side + col;
-        int myRoot = openSiteSets.find(siteIndex);
-        int fullRoot = openSiteSets.find(grid.length);
-        return myRoot == fullRoot;
+        return openSiteSets.connected(siteIndex, grid.length);
     }
 
     /** number of open sites */
@@ -90,10 +89,8 @@ public class Percolation {
 
     /** does the system percolate? */
     public boolean percolates() {
-        int fullRoot = openSiteSets.find(grid.length);
         for (int bottomIdx = grid.length - side; bottomIdx < grid.length; bottomIdx++) {
-            int bottomRoot = openSiteSets.find(bottomIdx);
-            if (fullRoot == bottomRoot) {
+            if (openSiteSets.connected(bottomIdx, grid.length)) {
                 return true;
             }
         }
