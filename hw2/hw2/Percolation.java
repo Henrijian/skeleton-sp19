@@ -1,6 +1,7 @@
 package hw2;
 
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
+import edu.princeton.cs.algs4.QuickFindUF;
 
 public class Percolation {
     private final int UNOPENED = 0;
@@ -35,6 +36,9 @@ public class Percolation {
         if (row < 0 || side <= row || col < 0 || side <= col) {
             throw new java.lang.IndexOutOfBoundsException();
         }
+        if (isOpen(row, col)) {
+            return;
+        }
         int siteIndex = row * side + col;
         this.grid[siteIndex] = OPENED;
         int[] aroundSiteIndices = {siteIndex - 1, siteIndex - side, siteIndex + 1, siteIndex + side};
@@ -67,8 +71,9 @@ public class Percolation {
             throw new java.lang.IndexOutOfBoundsException();
         }
         int siteIndex = row * side + col;
-        int root = openSiteSets.find(siteIndex);
-        return root == grid.length;
+        int myRoot = openSiteSets.find(siteIndex);
+        int fullRoot = openSiteSets.find(grid.length);
+        return myRoot == fullRoot;
     }
 
     /** number of open sites */
@@ -78,11 +83,9 @@ public class Percolation {
 
     /** does the system percolate? */
     public boolean percolates() {
-        int lastRowStartIdx = grid.length - side;
-        int lastRowEndIdx = grid.length - 1;
-        for (int lastRowIndex = lastRowStartIdx; lastRowIndex <= lastRowEndIdx ; lastRowIndex++) {
-            int root = openSiteSets.find(lastRowIndex);
-            if (root == grid.length) {
+        int lastRow = side - 1;
+        for (int col = 0; col < side; col++) {
+            if (isFull(lastRow, col)) {
                 return true;
             }
         }

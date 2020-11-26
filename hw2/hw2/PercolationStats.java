@@ -1,6 +1,7 @@
 package hw2;
 import edu.princeton.cs.introcs.StdRandom;
 import edu.princeton.cs.introcs.StdStats;
+import edu.princeton.cs.introcs.Stopwatch;
 
 public class PercolationStats {
     /** Sequence of percolation threshold of every experiment. */
@@ -22,7 +23,7 @@ public class PercolationStats {
                 int col = StdRandom.uniform(N);
                 percolation.open(row, col);
             }
-            percolationThresholdArray[i] = (double) percolation.numberOfOpenSites() / sitesCount;
+            percolationThresholdArray[i] = (double)percolation.numberOfOpenSites() / sitesCount;
         }
     }
 
@@ -44,5 +45,16 @@ public class PercolationStats {
     /** High endpoint of 95% confidence interval. */
     public double confidenceHigh() {
         return mean() + 1.96 * stddev() / Math.sqrt(percolationThresholdArray.length);
+    }
+
+    public static void main(String[] argv) {
+        Stopwatch timer = new Stopwatch();
+        int squareSide = 40;
+        int experimentTimes = 30;
+        PercolationFactory pf = new PercolationFactory();
+        PercolationStats ps = new PercolationStats(squareSide, experimentTimes, pf);
+        System.out.printf("N = %d, T = %d\n", squareSide, experimentTimes);
+        System.out.printf("percolation low: %f, high: %f\n", ps.confidenceLow(), ps.confidenceHigh());
+        System.out.printf("elapsed time: %.4f\n", timer.elapsedTime());
     }
 }
