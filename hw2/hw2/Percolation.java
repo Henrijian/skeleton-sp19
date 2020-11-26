@@ -41,7 +41,14 @@ public class Percolation {
         }
         int siteIndex = row * side + col;
         this.grid[siteIndex] = OPENED;
-        int[] aroundSiteIndices = {siteIndex - 1, siteIndex - side, siteIndex + 1, siteIndex + side};
+        int[] aroundSiteIndices;
+        if (col % side == side - 1) {
+            aroundSiteIndices = new int[]{siteIndex - 1, siteIndex - side, siteIndex + side};
+        } else if (col % side == 0) {
+            aroundSiteIndices = new int[]{siteIndex - side, siteIndex + 1, siteIndex + side};
+        } else {
+            aroundSiteIndices = new int[]{siteIndex - 1, siteIndex - side, siteIndex + 1, siteIndex + side};
+        }
         for (int aroundSiteIndex: aroundSiteIndices) {
             if (aroundSiteIndex < 0 || grid.length <= aroundSiteIndex) {
                 continue;
