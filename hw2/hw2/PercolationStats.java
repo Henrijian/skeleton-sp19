@@ -46,15 +46,4 @@ public class PercolationStats {
     public double confidenceHigh() {
         return mean() + 1.96 * stddev() / Math.sqrt(percolationThresholdArray.length);
     }
-
-    public static void main(String[] argv) {
-        Stopwatch timer = new Stopwatch();
-        int squareSide = 40;
-        int experimentTimes = 30;
-        PercolationFactory pf = new PercolationFactory();
-        PercolationStats ps = new PercolationStats(squareSide, experimentTimes, pf);
-        System.out.printf("N = %d, T = %d\n", squareSide, experimentTimes);
-        System.out.printf("percolation low: %f, high: %f\n", ps.confidenceLow(), ps.confidenceHigh());
-        System.out.printf("elapsed time: %.4f\n", timer.elapsedTime());
-    }
 }
