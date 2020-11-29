@@ -11,9 +11,9 @@ public class Percolation {
     /** Length of side of grid of square. */
     private int side;
     /** Root index for all site connected to top sites. (index = side * side) */
-    private int rootTopIdx;
+    private final int ROOT_TOP_IDX;
     /** Root index for all site connected to bottom sites. (index = side * side) */
-    private int rootBottomIdx;
+    private final int ROOT_BOTTOM_IDX;
     /** Record whether the grid is percolated. */
     private boolean percolated;
     /** Sets of open sites, last index for the root of top sites. */
@@ -34,8 +34,8 @@ public class Percolation {
             grid[i] = UNOPENED;
         }
         this.side = N;
-        this.rootTopIdx = siteCount;
-        this.rootBottomIdx = siteCount;
+        this.ROOT_TOP_IDX = siteCount;
+        this.ROOT_BOTTOM_IDX = siteCount;
         this.percolated = false;
         this.topSiteSets = new WeightedQuickUnionUF(siteCount + 1); // 1 for rootTopIdx index.
         this.bottomSiteSets = new WeightedQuickUnionUF(siteCount + 1); // 1 for rootBottomIdx index.
@@ -68,14 +68,14 @@ public class Percolation {
             }
         }
         if (siteIndex < side) {
-            topSiteSets.union(siteIndex, rootTopIdx);
+            topSiteSets.union(siteIndex, ROOT_TOP_IDX);
         }
         if (grid.length - side <= siteIndex && siteIndex < grid.length) {
-            bottomSiteSets.union(siteIndex, rootBottomIdx);
+            bottomSiteSets.union(siteIndex, ROOT_BOTTOM_IDX);
         }
         if (!percolated) {
-            percolated = topSiteSets.connected(rootTopIdx, siteIndex)
-                && bottomSiteSets.connected(rootBottomIdx, siteIndex);
+            percolated = topSiteSets.connected(ROOT_TOP_IDX, siteIndex)
+                && bottomSiteSets.connected(ROOT_BOTTOM_IDX, siteIndex);
         }
         openSiteCount += 1;
     }
@@ -97,7 +97,7 @@ public class Percolation {
     /** is the site (row, col) full? */
     public boolean isFull(int row, int col) {
         int siteIndex = siteIndex(row, col);
-        return topSiteSets.connected(siteIndex, this.rootTopIdx);
+        return topSiteSets.connected(siteIndex, this.ROOT_TOP_IDX);
     }
 
     /** number of open sites */
