@@ -10,12 +10,16 @@ public class Percolation {
     private int[] grid;
     /** Length of side of grid of square. */
     private int side;
-    /** Index in full sets. (index = side * side) */
-    private int fullIdx;
+    /** Root index for all site connected to top sites. (index = side * side) */
+    private int rootTopIdx;
+    /** Root index for all site connected to bottom sites. (index = side * side) */
+    private int rootBottomIdx;
     /** Record whether the grid is percolated. */
     private boolean percolated;
-    /** Sets of open cell, last index for the root of full sites. */
-    private WeightedQuickUnionUF openSiteSets;
+    /** Sets of open sites, last index for the root of top sites. */
+    private WeightedQuickUnionUF topSiteSets;
+    /** Sets of open sites, last index for the root of bottom sites. */
+    private WeightedQuickUnionUF bottomSiteSets;
     /** Number of opened cell. */
     private int openSiteCount;
 
@@ -30,18 +34,17 @@ public class Percolation {
             grid[i] = UNOPENED;
         }
         this.side = N;
-        this.fullIdx = siteCount;
+        this.rootTopIdx = siteCount;
+        this.rootBottomIdx = siteCount;
         this.percolated = false;
-        this.openSiteSets = new WeightedQuickUnionUF(siteCount + 1); // 1 for full index.
+        this.topSiteSets = new WeightedQuickUnionUF(siteCount + 1); // 1 for rootTopIdx index.
+        this.bottomSiteSets = new WeightedQuickUnionUF(siteCount + 1); // 1 for rootBottomIdx index.
         this.openSiteCount = 0;
     }
 
     /** open the site (row, col) if it is not open already */
     public void open(int row, int col) {
-        if (row < 0 || side <= row || col < 0 || side <= col) {
-            throw new java.lang.IndexOutOfBoundsException();
-        }
-        int siteIndex = row * side + col;
+        int siteIndex = siteIndex(row, col);
         if (grid[siteIndex] == OPENED) {
             return;
         }
@@ -60,39 +63,41 @@ public class Percolation {
                 continue;
             }
             if (grid[aroundSiteIndex] == OPENED) {
-                openSiteSets.union(aroundSiteIndex, siteIndex);
+                topSiteSets.union(aroundSiteIndex, siteIndex);
+                bottomSiteSets.union(aroundSiteIndex, siteIndex);
             }
         }
         if (siteIndex < side) {
-            openSiteSets.union(fullIdx, siteIndex);
+            topSiteSets.union(siteIndex, rootTopIdx);
+        }
+        if (grid.length - side <= siteIndex && siteIndex < grid.length) {
+            bottomSiteSets.union(siteIndex, rootBottomIdx);
+        }
+        if (!percolated) {
+            percolated = topSiteSets.connected(rootTopIdx, siteIndex)
+                && bottomSiteSets.connected(rootBottomIdx, siteIndex);
         }
         openSiteCount += 1;
-        if (!percolated) {
-            for (int bottomIdx = grid.length - side; bottomIdx < grid.length; bottomIdx++) {
-                if (openSiteSets.connected(bottomIdx, fullIdx)) {
-                    percolated = true;
-                    break;
-                }
-            }
+    }
+
+    /** Get the index of row and col in grid. */
+    private int siteIndex(int row, int col) {
+        if (row < 0 || side <= row || col < 0 || side <= col) {
+            throw new java.lang.IndexOutOfBoundsException();
         }
+        return row * side + col;
     }
 
     /** is the site (row, col) open? */
     public boolean isOpen(int row, int col) {
-        if (row < 0 || side <= row || col < 0 || side <= col) {
-            throw new java.lang.IndexOutOfBoundsException();
-        }
-        int siteIndex = row * side + col;
+        int siteIndex = siteIndex(row, col);
         return grid[siteIndex] == OPENED;
     }
 
     /** is the site (row, col) full? */
     public boolean isFull(int row, int col) {
-        if (row < 0 || side <= row || col < 0 || side <= col) {
-            throw new java.lang.IndexOutOfBoundsException();
-        }
-        int siteIndex = row * side + col;
-        return openSiteSets.connected(siteIndex, this.fullIdx);
+        int siteIndex = siteIndex(row, col);
+        return topSiteSets.connected(siteIndex, this.rootTopIdx);
     }
 
     /** number of open sites */
