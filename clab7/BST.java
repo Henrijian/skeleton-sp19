@@ -60,7 +60,6 @@ public class BST<Key extends Comparable<Key>> {
         root = deleteTakingRandom(root, key);
     }
 
-
     /** Returns a random item from the BST. */
     public Key getRandomKey() {
         return getRandomNode(root).key;
@@ -175,7 +174,6 @@ public class BST<Key extends Comparable<Key>> {
         }
     }
 
-
     private Node add(Node x, Key key) {
         if (x == null) return new Node(key, 1);
         int cmp = key.compareTo(x.key);
@@ -228,7 +226,6 @@ public class BST<Key extends Comparable<Key>> {
         else return x.size;
     }
 
-
     private boolean contains(Node x, Key key) {
         if (key == null) throw new IllegalArgumentException("calls get() with a null key");
         if (x == null) return false;
@@ -238,12 +235,29 @@ public class BST<Key extends Comparable<Key>> {
         else              return true;
     }
 
-
     /**
      * Returns true if this BST is empty.
      * @return {@code true} if this BST is empty; {@code false} otherwise
      */
     private boolean isEmpty() {
         return size() == 0;
+    }
+
+    /** Return the path length from node x as at depth. */
+    private int pathLength(Node x, int depth) {
+        if (x == null) {
+            return 0;
+        }
+        return depth + pathLength(x.left, depth + 1) + pathLength(x.right, depth + 1);
+    }
+
+    /** Return sum of the lengths of the paths to every node. */
+    public int internalPathLength() {
+        return pathLength(root, 0);
+    }
+
+    /** Return average depth of this tree. */
+    public double averageDepth() {
+        return (double) internalPathLength() / size();
     }
 }

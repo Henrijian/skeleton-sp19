@@ -214,4 +214,22 @@ public class MyBST<K extends Comparable<K>> implements Iterable<K> {
     public Iterator<K> iterator() {
         return new KeyIterator(root);
     }
+
+    /** Return the path length from node x as at depth. */
+    private int pathLength(Node tree, int depth) {
+        if (tree == null) {
+            return 0;
+        }
+        return depth + pathLength(tree.left, depth + 1) + pathLength(tree.right, depth + 1);
+    }
+
+    /** Return sum of the lengths of the paths to every node. */
+    public int internalPathLength() {
+        return pathLength(root, 0);
+    }
+
+    /** Return average depth of this tree. */
+    public double averageDepth() {
+        return (double) internalPathLength() / size();
+    }
 }
