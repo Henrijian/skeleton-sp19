@@ -26,6 +26,17 @@ public class TestSimpleOomage {
           meaning no two SimpleOomages should EVER have the same
           hashCode UNLESS they have the same red, blue, and green values!
          */
+        HashSet<Integer> hashCodeSet = new HashSet<>();
+        for (int red = 0; red <= 255; red *= 5) {
+            for (int gree = 0; gree <= 255; gree *= 5) {
+                for (int blue = 0; blue <= 255; blue *= 5) {
+                    SimpleOomage so = new SimpleOomage(red, gree, blue);
+                    Integer hashCode = so.hashCode();
+                    assertFalse(hashCodeSet.contains(hashCode));
+                    hashCodeSet.add(hashCode);
+                }
+            }
+        }
     }
 
     @Test
