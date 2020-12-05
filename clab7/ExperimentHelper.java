@@ -1,3 +1,5 @@
+import java.util.Random;
+
 /**
  * Created by hug.
  */
@@ -35,5 +37,23 @@ public class ExperimentHelper {
      */
     public static double optimalAverageDepth(int N) {
         return (double) optimalIPL(N) / N;
+    }
+
+    public static void randomlyDeleteAndInsert(BST<Integer> bst, int operationCount, boolean deleteRandom) {
+        for (int operationIdx = 0; operationIdx < operationCount; operationIdx++) {
+            int deleteKey = bst.getRandomKey();
+            if (deleteRandom) {
+                bst.deleteTakingRandom(deleteKey);
+            } else {
+                bst.deleteTakingSuccessor(deleteKey);
+            }
+
+            Random r = new Random();
+            int insertKey;
+            do {
+                insertKey = r.nextInt(Integer.MAX_VALUE);
+            } while (bst.contains(insertKey));
+            bst.add(insertKey);
+        }
     }
 }
