@@ -1,8 +1,6 @@
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Set;
+package lab9;
+
+import java.util.*;
 
 public class MyHashMap<Key, Value> implements Map61B<Key, Value> {
     private class Item {
@@ -17,15 +15,18 @@ public class MyHashMap<Key, Value> implements Map61B<Key, Value> {
     private final double LOAD_FACTOR_BOUND;
     private final int ENLARGE_FACTOR = 2;
     private final HashSet<Key> keys;
-    private ArrayList<Item> [] buckets;
+    private LinkedList<Item>[] buckets;
 
     private static final int DEFAULT_SIZE = 16;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
 
     public MyHashMap(int initialSize, double loadFactor) {
+        if (initialSize < 0 || loadFactor <= 0) {
+            throw new IllegalArgumentException();
+        }
         this.LOAD_FACTOR_BOUND = loadFactor;
         this.keys = new HashSet<>();
-        this.buckets = (ArrayList<Item>[]) new ArrayList[initialSize];
+        this.buckets = (LinkedList<Item>[]) new LinkedList[initialSize];
     }
 
     public MyHashMap(int initialSize) {
@@ -54,7 +55,7 @@ public class MyHashMap<Key, Value> implements Map61B<Key, Value> {
     @Override
     public Value get(Key k) {
         int hashIdx = hashIdx(k.hashCode());
-        ArrayList<Item> sepChain = buckets[hashIdx];
+        LinkedList<Item> sepChain = buckets[hashIdx];
         if (sepChain == null) {
             return null;
         }
@@ -73,9 +74,9 @@ public class MyHashMap<Key, Value> implements Map61B<Key, Value> {
 
     /** Resize array of buckets to specified number. */
     private void resize(int size) {
-        ArrayList<Item>[] oldBuckets = buckets;
-        buckets = (ArrayList<Item>[]) new ArrayList[size];
-        for (ArrayList<Item> sepChain : oldBuckets) {
+        LinkedList<Item>[] oldBuckets = buckets;
+        buckets = (LinkedList<Item>[]) new LinkedList[size];
+        for (LinkedList<Item> sepChain : oldBuckets) {
             if (sepChain == null) {
                 continue;
             }
@@ -88,9 +89,9 @@ public class MyHashMap<Key, Value> implements Map61B<Key, Value> {
     /** Add key and value to buckets. */
     private void add(Key k, Value v) {
         int hashIdx = hashIdx(k.hashCode());
-        ArrayList<Item> sepChain = buckets[hashIdx];
+        LinkedList<Item> sepChain = buckets[hashIdx];
         if (sepChain == null) {
-            sepChain = new ArrayList<>();
+            sepChain = new LinkedList<>();
             buckets[hashIdx] = sepChain;
         }
         for (Item item: sepChain) {
@@ -100,7 +101,7 @@ public class MyHashMap<Key, Value> implements Map61B<Key, Value> {
             }
         }
         Item newItem = new Item(k, v);
-        sepChain.add(newItem);
+        sepChain.addFirst(newItem);
     }
 
     @Override
@@ -120,12 +121,36 @@ public class MyHashMap<Key, Value> implements Map61B<Key, Value> {
 
     @Override
     public Value remove(Key k) {
-        throw new UnsupportedOperationException();
+        return remove(k, null);
     }
 
     @Override
     public Value remove(Key k, Value v) {
-        throw new UnsupportedOperationException();
+        int hashIdx = hashIdx(k.hashCode());
+        LinkedList<Item> sepChain = buckets[hashIdx];
+        if (sepChain == null) {
+            return null;
+        }
+        Value removedValue = null;
+        for (Item item: sepChain) {
+            if (!item.key.equals(k)) {
+                continue;
+            }
+            if (item.value.equals(v) || v == null) {
+                removedValue = item.value;
+                sepChain.remove(item);
+                break;
+            }
+        }
+        if (removedValue != null) {
+            keys.remove(k);
+            double loadFactorBound = (double) buckets.length / ENLARGE_FACTOR * LOAD_FACTOR_BOUND / 2;
+            double loadFactor = (double) keys.size() / buckets.length;
+            if (loadFactor <= loadFactorBound) {
+                resize(buckets.length / ENLARGE_FACTOR);
+            }
+        }
+        return removedValue;
     }
 
     public Iterator<Key> iterator() {
