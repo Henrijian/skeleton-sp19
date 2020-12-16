@@ -19,30 +19,36 @@ public class FlightSolver {
     }
 
     public int solve() {
-        Comparator<Integer> timeStampComparator = (Integer timeStampA, Integer timeStampB) -> {
-            int diff = timeStampA - timeStampB;
+        Comparator<Flight> startTimeComparator = (Flight flightA, Flight flightB) -> {
+            int diff = flightA.startTime - flightB.startTime;
             return diff;
         };
-        PriorityQueue<Integer> timeStampQueue = new PriorityQueue<>(timeStampComparator);
+        Comparator<Flight> endTimeComparator = (Flight flightA, Flight flightB) -> {
+            int diff = flightA.endTime - flightB.endTime;
+            return diff;
+        };
+        PriorityQueue<Flight> startTimeQueue = new PriorityQueue<>(startTimeComparator);
+        PriorityQueue<Flight> endTimeQueue = new PriorityQueue<>(endTimeComparator);
         for (Flight flight: flights) {
-            timeStampQueue.add(flight.startTime);
-            timeStampQueue.add(flight.endTime);
+            startTimeQueue.add(flight);
+            endTimeQueue.add(flight);
         }
         int maxPassengers = 0;
-        int startTime = 0;
+        int curPassengers = 0;
         do {
-            Integer endTime = timeStampQueue.poll();
-            int curPassengers = 0;
-            for (Flight flight: flights) {
-                if (flight.startTime <= startTime && endTime <= flight.endTime) {
-                    curPassengers += flight.passengers;
+            Flight startFlight = startTimeQueue.peek();
+            Flight endFlight = endTimeQueue.peek();
+            if (startFlight == null || endFlight.endTime < startFlight.startTime) {
+                curPassengers -= endFlight.passengers;
+                endTimeQueue.poll();
+            } else if (startFlight.startTime < endFlight.endTime) {
+                curPassengers += startFlight.passengers;
+                startTimeQueue.poll();
+                if (curPassengers > maxPassengers) {
+                    maxPassengers = curPassengers;
                 }
             }
-            startTime = endTime;
-            if (curPassengers > maxPassengers) {
-                maxPassengers = curPassengers;
-            }
-        } while (timeStampQueue.size() != 0);
+        } while (startTimeQueue.size() != 0 || endTimeQueue.size() != 0);
         return maxPassengers;
     }
 
