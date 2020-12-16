@@ -122,7 +122,11 @@ public class MyHashMap<Key, Value> implements Map61B<Key, Value> {
     @Override
     public Value remove(Key k) {
         return remove(k, null);
-    }
+        Map<String, Set> testMap = new HashMap<>();
+        String a = "asds";
+        testMap.get;
+        testMap.con
+     }
 
     @Override
     public Value remove(Key k, Value v) {
