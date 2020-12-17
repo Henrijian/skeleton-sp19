@@ -4,7 +4,10 @@
  * string-matching algorithm.
  */
 class RollingString{
-
+    private StringBuilder stringBuff;
+    private int hashBuff;
+    private int length;
+    private int oldCharHashBash;
     /**
      * Number of total possible int values a character can take on.
      * DO NOT CHANGE THIS.
@@ -23,7 +26,16 @@ class RollingString{
      */
     public RollingString(String s, int length) {
         assert(s.length() == length);
-        /* FIX ME */
+        this.stringBuff = new StringBuilder(s);
+        this.hashBuff = 0;
+        for (int i = 0; i < length; i++) {
+            this.hashBuff = (((this.hashBuff * UNIQUECHARS) % PRIMEBASE) + (int) s.charAt(i)) % PRIMEBASE;
+        }
+        this.length = length;
+        this.oldCharHashBash = 1;
+        for (int i = 1; i < length; i++) {
+            this.oldCharHashBash = (this.oldCharHashBash * UNIQUECHARS) % PRIMEBASE;
+        }
     }
 
     /**
@@ -32,9 +44,11 @@ class RollingString{
      * Should be a constant-time operation.
      */
     public void addChar(char c) {
-        /* FIX ME */
+        this.hashBuff = ((this.hashBuff + PRIMEBASE - (int) stringBuff.charAt(0) * oldCharHashBash)
+                * UNIQUECHARS + (int) c) % PRIMEBASE;
+        stringBuff.deleteCharAt(0);
+        stringBuff.append(c);
     }
-
 
     /**
      * Returns the "string" stored in this RollingString, i.e. materializes
@@ -42,9 +56,7 @@ class RollingString{
      * the string.
      */
     public String toString() {
-        StringBuilder strb = new StringBuilder();
-        /* FIX ME */
-        return "";
+        return stringBuff.toString();
     }
 
     /**
@@ -52,8 +64,7 @@ class RollingString{
      * Should be a constant-time operation.
      */
     public int length() {
-        /* FIX ME */
-        return -1;
+        return stringBuff.length();
     }
 
 
@@ -64,8 +75,7 @@ class RollingString{
      */
     @Override
     public boolean equals(Object o) {
-        /* FIX ME */
-        return false;
+        return this.toString().equals(o.toString());
     }
 
     /**
@@ -74,7 +84,6 @@ class RollingString{
      */
     @Override
     public int hashCode() {
-        /* FIX ME */
-        return -1;
+        return hashBuff;
     }
 }
