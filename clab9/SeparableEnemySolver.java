@@ -8,7 +8,7 @@ public class SeparableEnemySolver {
 
     /**
      * Creates a SeparableEnemySolver for a file with name filename. Enemy
-     * relationships are biderectional (if A is an enemy of B, B is an enemy of A).
+     * relationships are bidirectional (if A is an enemy of B, B is an enemy of A).
      */
     SeparableEnemySolver(String filename) throws java.io.FileNotFoundException {
         this.g = graphFromFile(filename);
@@ -23,8 +23,40 @@ public class SeparableEnemySolver {
      * Returns true if input is separable, false otherwise.
      */
     public boolean isSeparable() {
-        // TODO: Fix me
-        return false;
+        // Instantiate indexed label list.
+        ArrayList<String> labels = new ArrayList<>();
+        for (String label: g.labels()) {
+            labels.add(label);
+        }
+        // Instantiate label indexed array of marked and color for checking.
+        boolean[] marked = new boolean[labels.size()];
+        boolean[] isBlue = new boolean[labels.size()];
+        // Breadth first search for checking whether there are two node connected having same color.
+        Queue<Integer> queue = new LinkedList<>();
+        for (int s = 0; s < labels.size(); s++) {
+            if (marked[s]) {
+                continue;
+            }
+            queue.offer(s);
+            marked[s] = true;
+            isBlue[s] = true;
+            while (queue.size() != 0) {
+                int v = queue.poll();
+                for (String neighbor: g.neighbors(labels.get(v))) {
+                    int w = labels.indexOf(neighbor);
+                    if (marked[w]) {
+                        if (isBlue[w] == isBlue[v]) {
+                            return false;
+                        }
+                        continue;
+                    }
+                    marked[w] = true;
+                    isBlue[w] = !isBlue[v];
+                    queue.offer(w);
+                }
+            }
+        }
+        return true;
     }
 
 
@@ -53,7 +85,7 @@ public class SeparableEnemySolver {
 
     /**
      * Reads an entire CSV and returns a List of Lists. Each inner
-     * List represents a line of the CSV with each comma-seperated
+     * List represents a line of the CSV with each comma-separated
      * value as an entry. Assumes CSV file does not contain commas
      * except as separators.
      * Returns null if invalid filename.
