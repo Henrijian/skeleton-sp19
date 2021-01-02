@@ -22,8 +22,10 @@ public class KDTreeTest {
         Point p1 = new Point(1.1, 2.2); // constructs a Point with x = 1.1, y = 2.2
         Point p2 = new Point(3.3, 4.4);
         Point p3 = new Point(-2.9, 4.2);
+        Point p4 = new Point(4.4, 3.3);
+        Point p5 = new Point(5.5, 5.5);
 
-        KDTree pointSet = new KDTree(List.of(p1, p2, p3));
+        KDTree pointSet = new KDTree(List.of(p1, p2, p3, p4, p5));
         Point nearest = pointSet.nearest(3.0, 4.0); // returns p2
         Assert.assertEquals(p2.getX(), nearest.getX(), 0);
         Assert.assertEquals(p2.getY(), nearest.getY(), 0);

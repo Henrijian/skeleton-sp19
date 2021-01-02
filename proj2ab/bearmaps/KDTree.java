@@ -41,19 +41,20 @@ public class KDTree implements PointSet {
         if (tree == null) {
             return new Node(point);
         }
+        int nextLevel = level + 1;
         Point treePoint = tree.point;
-        boolean considerX = level / 2 == 0;
+        boolean considerX = level % 2 == 0;
         if (considerX) {
             if (point.getX() < treePoint.getX()) {
-                tree.left = addPoint(tree.left, point, level++);
+                tree.left = addPoint(tree.left, point, nextLevel);
             } else {
-                tree.right = addPoint(tree.right, point, level++);
+                tree.right = addPoint(tree.right, point, nextLevel);
             }
         } else {
             if (point.getY() < treePoint.getY()) {
-                tree.left = addPoint(tree.left, point, level++);
+                tree.left = addPoint(tree.left, point, nextLevel);
             } else {
-                tree.right = addPoint(tree.right, point, level++);
+                tree.right = addPoint(tree.right, point, nextLevel);
             }
         }
         return tree;
