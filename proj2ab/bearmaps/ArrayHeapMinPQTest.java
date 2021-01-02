@@ -41,6 +41,9 @@ public class ArrayHeapMinPQTest {
         HashSet<Integer> including = new HashSet<>();
         for (int i = 0; i < 100000; i++) {
             Integer item = random.nextInt(Integer.MAX_VALUE);
+            while (including.contains(item)) {
+                item = random.nextInt(Integer.MAX_VALUE);
+            }
             double priority = random.nextDouble();
             including.add(item);
             arrayHeapMinPQ.add(item, priority);
