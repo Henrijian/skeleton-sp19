@@ -189,27 +189,27 @@ public class KDTree implements PointSet {
         }
     }
 
-    private Node nearest(Node root, Point goal, double best) {
+    private Node nearest(Node root, Point goal, Node best) {
         if (goal == null) {
             return null;
         }
         if (root == null) {
-            return null;
+            return best;
         }
 
-        Node nearestNode = null;
+        double bestDist = Point.distance(best.point, goal);
         double rootDist = Point.distance(root.point, goal);
-        if (rootDist < best) {
-            best = rootDist;
-            nearestNode = root;
+        if (rootDist < bestDist) {
+            best = root;
+            bestDist = rootDist;
         }
 
         Node goodSide;
         Node badSide;
         Point goodPoint;
         Point badPoint;
-        Point treePoint = root.point;
-        if ((root.considerX && goal.getX() < treePoint.getX()) || (!root.considerX && goal.getY() < treePoint.getY())) {
+        Point rootPoint = root.point;
+        if ((root.considerX && goal.getX() < rootPoint.getX()) || (!root.considerX && goal.getY() < rootPoint.getY())) {
             goodSide = root.left;
             badSide = root.right;
             goodPoint = root.leftRect().nearestPointTo(goal);
@@ -222,24 +222,17 @@ public class KDTree implements PointSet {
         }
 
         double goodDist = Point.distance(goodPoint, goal);
-        if (goodDist < best) {
-            Node goodNearest = nearest(goodSide, goal, best);
-            if (goodNearest != null) {
-                best = Point.distance(goodNearest.point, goal);
-                nearestNode = goodNearest;
-            }
+        if (goodDist < bestDist) {
+            best = nearest(goodSide, goal, best);
+            bestDist = Point.distance(best.point, goal);;
         }
 
         double badDist = Point.distance(badPoint, goal);
-        if (badDist < best) {
-            Node badNearest = nearest(badSide, goal, best);
-            if (badNearest != null) {
-                best = Point.distance(badNearest.point, goal);
-                nearestNode = badNearest;
-            }
+        if (badDist < bestDist) {
+            best = nearest(badSide, goal, best);
         }
 
-        return nearestNode;
+        return best;
     }
 
     @Override
@@ -248,7 +241,7 @@ public class KDTree implements PointSet {
             return null;
         }
         Point goal = new Point(x, y);
-        Node nearestNode = nearest(root, goal, Double.MAX_VALUE);
+        Node nearestNode = nearest(root, goal, root);
         return nearestNode.point;
     }
 }
