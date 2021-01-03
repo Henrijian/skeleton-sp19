@@ -7,15 +7,150 @@ import java.util.HashSet;
 import java.util.List;
 
 public class KDTree implements PointSet {
+    private class Rect {
+        private double top;
+        private double right;
+        private double bottom;
+        private double left;
+
+        public Rect() {
+            top = Double.MAX_VALUE;
+            right = Double.MAX_VALUE;
+            bottom = -Double.MAX_VALUE;
+            left = -Double.MAX_VALUE;
+        }
+
+        public Rect(double top, double right, double bottom, double left) {
+            if (top < bottom || right < left) {
+                throw new IllegalArgumentException("top or right boundary of rectangle is smaller " +
+                        "than bottom or left boundary of rectangle.");
+            }
+            this.top = top;
+            this.right = right;
+            this.bottom = bottom;
+            this.left = left;
+        }
+
+        public double getTop() {
+            return top;
+        }
+
+        public double getRight() {
+            return right;
+        }
+
+        public double getBottom() {
+            return bottom;
+        }
+
+        public double getLeft() {
+            return left;
+        }
+
+        public void setTop(double top) {
+            if (top < this.bottom) {
+                throw new IllegalArgumentException("Setting top is smaller than bottom of rectangle.");
+            }
+            this.top = top;
+        }
+
+        public void setRight(double right) {
+            if (right < this.left) {
+                throw new IllegalArgumentException("Setting right is smaller than left of rectangle.");
+            }
+            this.right = right;
+        }
+
+        public void setBottom(double bottom) {
+            if (bottom > this.top) {
+                throw new IllegalArgumentException("Setting bottom is greater than top of rectangle.");
+            }
+            this.bottom = bottom;
+        }
+
+        public void setLeft(double left) {
+            if (left > this.right) {
+                throw new IllegalArgumentException("Setting left is greater than right of rectangle.");
+            }
+            this.left = left;
+        }
+
+        public boolean includePoint(Point p) {
+            if (p == null) {
+                return false;
+            }
+            return left <= p.getX() && p.getX() <= right && bottom <= p.getY() && p.getY() <= top;
+        }
+
+        public Point nearestPointTo(Point p) {
+            if (p == null) {
+                throw new IllegalArgumentException("Cannot find the nearest point to null in rectangle.");
+            }
+
+            double x;
+            if (p.getX() < left) {
+                x = left;
+            } else if (right < p.getX()) {
+                x = right;
+            } else {
+                x = p.getX();
+            }
+
+            double y;
+            if (p.getY() < bottom) {
+                y = bottom;
+            } else if (top < p.getY()) {
+                y = top;
+            } else {
+                y = p.getY();
+            }
+
+            return new Point(x, y);
+        }
+
+        public String toString() {
+            return String.format("Top: %.10f, Right: %.10f, Bottom: %.10f, Left: %.10f", top, right, bottom, left);
+        }
+    }
+
     private class Node {
         public Point point;
         public Node right;
         public Node left;
+        public boolean considerX;
+        public Rect rect;
 
-        public Node(Point p) {
-            point = p;
-            right = null;
-            left = null;
+        public Node(Point point, boolean considerX, Rect rect) {
+            if (point == null) {
+                throw new IllegalArgumentException("Point for initiating Node cannot be null.");
+            }
+            if (rect == null) {
+                throw new IllegalArgumentException("Rect for initiating Node cannot be null.");
+            }
+            if (!rect.includePoint(point)) {
+                throw new IllegalArgumentException(String.format("Rect(%s) does not contain point(%s).", rect, point));
+            }
+            this.point = point;
+            this.right = null;
+            this.left = null;
+            this.considerX = considerX;
+            this.rect = rect;
+        }
+
+        public Rect leftRect() {
+            if (considerX) {
+                return new Rect(rect.top, point.getX(), rect.bottom, rect.left);
+            } else {
+                return new Rect(point.getY(), rect.right, rect.bottom, rect.left);
+            }
+        }
+
+        public Rect rightRect() {
+            if (considerX) {
+                return new Rect(rect.top, rect.right, rect.bottom, point.getX());
+            } else {
+                return new Rect(rect.top, rect.right, point.getY(), rect.left);
+            }
         }
     }
 
@@ -23,45 +158,88 @@ public class KDTree implements PointSet {
     private Node root;
 
     public KDTree(List<Point> points) {
-        for (int i = 0; i < points.size(); i++) {
-            Point point = points.get(i);
+        for (Point point : points) {
             Point newPoint = new Point(point.getX(), point.getY());
-            if (i == 0) {
-                root = new Node(newPoint);
-                continue;
-            }
             addPoint(newPoint);
         }
     }
 
-    private Node addPoint(Node tree, Point point, int level) {
+    private Node addPoint(Node root, Point point, boolean considerX, Rect rect) {
         if (point == null) {
-            return tree;
+            return root;
         }
-        if (tree == null) {
-            return new Node(point);
+        if (root == null) {
+            return new Node(point, considerX, rect);
         }
-        int nextLevel = level + 1;
-        Point treePoint = tree.point;
-        boolean considerX = level % 2 == 0;
-        if (considerX) {
-            if (point.getX() < treePoint.getX()) {
-                tree.left = addPoint(tree.left, point, nextLevel);
-            } else {
-                tree.right = addPoint(tree.right, point, nextLevel);
-            }
+        Rect leftRect = root.leftRect();
+        if (leftRect.includePoint(point)) {
+            root.left = addPoint(root.left, point, !considerX, leftRect);
         } else {
-            if (point.getY() < treePoint.getY()) {
-                tree.left = addPoint(tree.left, point, nextLevel);
-            } else {
-                tree.right = addPoint(tree.right, point, nextLevel);
-            }
+            Rect rightRect = root.rightRect();
+            root.right = addPoint(root.right, point, !considerX, rightRect);
         }
-        return tree;
+        return root;
     }
 
     private void addPoint(Point point) {
-        root = addPoint(root, point, 0);
+        if (root == null) {
+            root = new Node(point, true, new Rect());
+        } else {
+            root = addPoint(root, point, root.considerX, root.rect);
+        }
+    }
+
+    private Node nearest(Node root, Point goal, double best) {
+        if (goal == null) {
+            return null;
+        }
+        if (root == null) {
+            return null;
+        }
+
+        Node nearestNode = null;
+        double rootDist = Point.distance(root.point, goal);
+        if (rootDist < best) {
+            best = rootDist;
+            nearestNode = root;
+        }
+
+        Node goodSide;
+        Node badSide;
+        Point goodPoint;
+        Point badPoint;
+        Point treePoint = root.point;
+        if ((root.considerX && goal.getX() < treePoint.getX()) || (!root.considerX && goal.getY() < treePoint.getY())) {
+            goodSide = root.left;
+            badSide = root.right;
+            goodPoint = root.leftRect().nearestPointTo(goal);
+            badPoint = root.rightRect().nearestPointTo(goal);
+        } else {
+            goodSide = root.right;
+            badSide = root.left;
+            goodPoint = root.rightRect().nearestPointTo(goal);
+            badPoint = root.leftRect().nearestPointTo(goal);
+        }
+
+        double goodDist = Point.distance(goodPoint, goal);
+        if (goodDist < best) {
+            Node goodNearest = nearest(goodSide, goal, best);
+            if (goodNearest != null) {
+                best = Point.distance(goodNearest.point, goal);
+                nearestNode = goodNearest;
+            }
+        }
+
+        double badDist = Point.distance(badPoint, goal);
+        if (badDist < best) {
+            Node badNearest = nearest(badSide, goal, best);
+            if (badNearest != null) {
+                best = Point.distance(badNearest.point, goal);
+                nearestNode = badNearest;
+            }
+        }
+
+        return nearestNode;
     }
 
     @Override
@@ -69,6 +247,8 @@ public class KDTree implements PointSet {
         if (root == null) {
             return null;
         }
-        return null;
+        Point goal = new Point(x, y);
+        Node nearestNode = nearest(root, goal, Double.MAX_VALUE);
+        return nearestNode.point;
     }
 }
