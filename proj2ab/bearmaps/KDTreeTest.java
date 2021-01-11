@@ -34,7 +34,7 @@ public class KDTreeTest {
             points.add(point);
         }
         ArrayList<Point> goals = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10000; i++) {
             double x = random.nextDouble();
             double y = random.nextDouble();
             Point goal = new Point(x, y);
