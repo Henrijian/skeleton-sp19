@@ -97,14 +97,14 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
         fixedVertices.add(v);
         for (WeightedEdge<Vertex> outEdge: G.neighbors(v)) {
             Vertex neighbor = outEdge.to();
-            if (outEdge.to().equals(v)) {
+            if (neighbor.equals(v)) {
                 neighbor = outEdge.from();
             }
             if (fixedVertices.contains(neighbor)) {
                 continue;
             }
             double fromSourceDist = distTo.get(v) + outEdge.weight();
-            if (!distTo.containsKey(neighbor) || distTo.get(neighbor) < fromSourceDist) {
+            if (!distTo.containsKey(neighbor) || fromSourceDist < distTo.get(neighbor)) {
                 distTo.put(neighbor, fromSourceDist);
                 edgeTo.put(neighbor, v);
                 double potentialDist = fromSourceDist + G.estimatedDistanceToGoal(neighbor, end);
