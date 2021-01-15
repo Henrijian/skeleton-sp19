@@ -1,6 +1,8 @@
 import edu.princeton.cs.algs4.Queue;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
+import org.junit.Assert;
 
 public class TestSortAlgs {
 
@@ -11,7 +13,15 @@ public class TestSortAlgs {
 
     @Test
     public void testMergeSort() {
+        Queue<String> unsortedQueue = new Queue<>();
+        unsortedQueue.enqueue("Henri");
+        unsortedQueue.enqueue("Jenny");
+        unsortedQueue.enqueue("Cindy");
+        unsortedQueue.enqueue("Josh");
+        unsortedQueue.enqueue("Apple");
+        Queue<String> sortedQueue = MergeSort.mergeSort(unsortedQueue);
 
+        Assert.assertTrue(isSorted(sortedQueue));
     }
 
     /**
