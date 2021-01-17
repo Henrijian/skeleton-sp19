@@ -57,7 +57,16 @@ public class QuickSort {
     private static <Item extends Comparable> void partition(
             Queue<Item> unsorted, Item pivot,
             Queue<Item> less, Queue<Item> equal, Queue<Item> greater) {
-        // Your code here!
+        for (Item item: unsorted) {
+            int compare = item.compareTo(pivot);
+            if (compare < 0) {
+                less.enqueue(item);
+            } else if (compare > 0) {
+                greater.enqueue(item);
+            } else {
+                equal.enqueue(item);
+            }
+        }
     }
 
     /**
@@ -68,7 +77,18 @@ public class QuickSort {
      */
     public static <Item extends Comparable> Queue<Item> quickSort(
             Queue<Item> items) {
-        // Your code here!
-        return items;
+        if (items.size() <= 1) {
+            return items;
+        }
+        Item pivot = getRandomItem(items);
+        Queue<Item> lessItems = new Queue<>();
+        Queue<Item> equalItems = new Queue<>();
+        Queue<Item> greaterItems = new Queue<>();
+        partition(items, pivot, lessItems, equalItems, greaterItems);
+        Queue<Item> sortedLessItems = quickSort(lessItems);
+        Queue<Item> sortedGreaterItems = quickSort(greaterItems);
+        Queue<Item> result = catenate(sortedLessItems, equalItems);
+        result = catenate(result, sortedGreaterItems);
+        return result;
     }
 }

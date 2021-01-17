@@ -8,7 +8,15 @@ public class TestSortAlgs {
 
     @Test
     public void testQuickSort() {
+        Queue<String> unsortedQueue = new Queue<>();
+        unsortedQueue.enqueue("Henri");
+        unsortedQueue.enqueue("Jenny");
+        unsortedQueue.enqueue("Cindy");
+        unsortedQueue.enqueue("Josh");
+        unsortedQueue.enqueue("Apple");
+        Queue<String> sortedQueue = QuickSort.quickSort(unsortedQueue);
 
+        Assert.assertTrue(isSorted(sortedQueue));
     }
 
     @Test
