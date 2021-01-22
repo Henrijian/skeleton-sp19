@@ -2,6 +2,7 @@ package bearmaps.proj2c.server.handler.impl;
 
 import bearmaps.proj2c.AugmentedStreetMapGraph;
 import bearmaps.proj2c.server.handler.APIRouteHandler;
+import org.apache.commons.math3.analysis.function.Max;
 import spark.Request;
 import spark.Response;
 import bearmaps.proj2c.utils.Constants;
@@ -12,10 +13,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import static bearmaps.proj2c.utils.Constants.SEMANTIC_STREET_GRAPH;
 import static bearmaps.proj2c.utils.Constants.ROUTE_LIST;
@@ -84,11 +83,107 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
      */
     @Override
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
-        //System.out.println("yo, wanna know the parameters given by the web browser? They are:");
-        //System.out.println(requestParams);
+        Double queryMinLon = requestParams.get("ullon");
+        Double queryMaxLon = requestParams.get("lrlon");
+        Double queryMinLat = requestParams.get("lrlat");
+        Double queryMaxLat = requestParams.get("ullat");
+        // Check query region's needed data.
+        if (queryMinLon == null || queryMaxLon == null || queryMinLat == null || queryMaxLat == null) {
+            return queryFail();
+        }
+        // Check query region's validation.
+        if (queryMinLon >= queryMaxLon || queryMinLat >= queryMaxLat) {
+            return queryFail();
+        }
+        // Check query region is in boundary.
+        double boundMinLon = Constants.ROOT_ULLON;
+        double boundMaxLon = Constants.ROOT_LRLON;
+        double boundMinLat = Constants.ROOT_LRLAT;
+        double boundMaxLat = Constants.ROOT_ULLAT;
+        if (boundMaxLon < queryMinLon || queryMaxLon < boundMinLon ||
+                boundMaxLat < queryMinLat || queryMaxLat < boundMinLat) {
+            return queryFail();
+        }
+        Double queryWidth = requestParams.get("w");
+        Double queryHeight = requestParams.get("h");
+        // Check query size needed data.
+        if (queryWidth == null || queryHeight == null) {
+            return queryFail();
+        }
+        // Check query size validation.
+        if (queryWidth <= 0 || queryHeight <= 0) {
+            return queryFail();
+        }
+        // Calculate longitude distance per pixel(lonDPP).
+        double queryLonDPP = (queryMaxLon - queryMinLon) / queryWidth;
+        // Find the suitable level of image to represent query region.
+        // 7 is the highest level supported.
+        double boundLonSize = boundMaxLon - boundMinLon;
+        double boundLatSize = boundMaxLat - boundMinLat;
+        int level;
+        for (level = 0; level < 7; level++) {
+            int tileSideCount = (int) Math.pow(2, level);
+            double myLonDPP = boundLonSize / (tileSideCount * Constants.TILE_SIZE);
+            if (myLonDPP <= queryLonDPP) {
+                break;
+            }
+        }
+        // Get the query region in bound.
+        if (queryMinLon < boundMinLon) {
+            queryMinLon = boundMinLon;
+        }
+        if (boundMaxLon < queryMaxLon) {
+            queryMaxLon = boundMaxLon;
+        }
+        if (queryMinLat < boundMinLat) {
+            queryMinLat = boundMinLat;
+        }
+        if (boundMaxLat < queryMaxLat) {
+            queryMaxLat = boundMaxLat;
+        }
+        // Calculate the index of x and y of image being used for specified level.
+        int tileSideCount = (int) Math.pow(2, level);
+        double tileLonSize = boundLonSize / tileSideCount;
+        double tileLatSize = boundLatSize / tileSideCount;
+        int minImageX = (int) Math.floor((queryMinLon - boundMinLon) / tileLonSize);
+        if (minImageX < 0) {
+            minImageX = 0;
+        }
+        int maxImageX = (int) Math.floor((queryMaxLon - boundMinLon) / tileLonSize);
+        if (tileSideCount <= maxImageX) {
+            maxImageX = tileSideCount - 1;
+        }
+        int minImageY = (int) Math.floor((boundMaxLat - queryMaxLat) / tileLatSize);
+        if (minImageY < 0) {
+            minImageY = 0;
+        }
+        int maxImageY = (int) Math.floor((boundMaxLat - queryMinLat) / tileLatSize);
+        if (tileSideCount <= maxImageY) {
+            maxImageY = tileSideCount - 1;
+        }
+        // Get array of associated images name.
+        int xCount = maxImageX - minImageX + 1;
+        int yCount = maxImageY - minImageY + 1;
+        String[][] images = new String[yCount][xCount];
+        for (int y = minImageY; y <= maxImageY; y++) {
+            for (int x = minImageX; x <= maxImageX; x++) {
+                String imageName = String.format("d%d_x%d_y%d.png", level, x, y);
+                images[y - minImageY][x - minImageX] = imageName;
+            }
+        }
+        // Prepare result.
+        double resultMinLon = boundMinLon + minImageX * tileLonSize;
+        double resultMaxLon = boundMinLon + (maxImageX + 1) * tileLonSize;
+        double resultMinLat = boundMaxLat - (maxImageY + 1) * tileLatSize;
+        double resultMaxLat = boundMaxLat - minImageY * tileLatSize;
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented RasterAPIHandler.processRequest, nothing is displayed in "
-                + "your browser.");
+        results.put("render_grid", images);
+        results.put("raster_ul_lon", resultMinLon);
+        results.put("raster_ul_lat", resultMaxLat);
+        results.put("raster_lr_lon", resultMaxLon);
+        results.put("raster_lr_lat", resultMinLat);
+        results.put("depth", level);
+        results.put("query_success", true);
         return results;
     }
 
