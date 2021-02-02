@@ -1,13 +1,10 @@
 package byow.lab12;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
 import java.awt.*;
-import java.util.Random;
 
 /**
  * Draws a world consisting of hexagonal regions.
@@ -38,82 +35,82 @@ public class HexWorld {
     }
 
     /**
-     * Get height of hexagon with side side.
+     * Get height of hexagon with size side.
+     * @ size, side size of hexagon.
      * */
-    public static int hexagonHeight(int side) {
-        validateSide(side);
-        return side * 2;
+    public static int hexagonHeight(int size) {
+        validateSide(size);
+        return size * 2;
     }
 
     /**
-     * Get width of hexagon with side side.
+     * Get width of hexagon with size side.
+     * @ size, side size of hexagon.
      */
-    public static int hexagonWidth(int side) {
-        validateSide(side);
-        return 3 * side - 2;
+    public static int hexagonWidth(int size) {
+        validateSide(size);
+        return 3 * size - 2;
     }
 
     /**
-     * Get start position of hexagon, which lower left point is (x, y), at level level(0 - base).
+     * Get start X position of hexagon, which lower left point is (x, y), at level level(0 - base).
      */
-    public static Point hexagonStartPt(Point lowerLeftPt, int side, int level) {
-        validateSideAndLevel(side, level);
+    public static int hexagonStartX(Point lowerLeftPt, int size, int level) {
+        validateSideAndLevel(size, level);
         int startX = lowerLeftPt.x;
-        int startY = lowerLeftPt.y;
-        int hexHeight = hexagonHeight(side);
+        int hexHeight = hexagonHeight(size);
         int hexHalfHeight = hexHeight / 2;
         int deltaX;
         if (level < hexHalfHeight) {
-            deltaX = side - 1 - level;
+            deltaX = size - 1 - level;
         } else {
-            deltaX = level - side;
+            deltaX = level - size;
         }
-        int deltaY = level;
-        return new Point(startX + deltaX, startY + deltaY);
+        return startX + deltaX;
     }
 
     /**
      * Get end position of hexagon, which lower left point is (x, y), at level level(0 - base).
      */
-    public static Point hexagonEndPt(Point lowerLeftPt, int side, int level) {
-        validateSideAndLevel(side, level);
+    public static int hexagonEndX(Point lowerLeftPt, int size, int level) {
+        validateSideAndLevel(size, level);
         int startX = lowerLeftPt.x;
-        int startY = lowerLeftPt.y;
-        int hexWidth = hexagonWidth(side);
-        int hexHeight = hexagonHeight(side);
+        int hexWidth = hexagonWidth(size);
+        int hexHeight = hexagonHeight(size);
         int hexHalfHeight = hexHeight / 2;
         int deltaX;
         if (level < hexHalfHeight) {
-            deltaX = hexWidth - 1 - side + 1 + level;
+            deltaX = hexWidth - 1 - size + 1 + level;
         } else {
-            deltaX = hexWidth - 1  - level + side;
+            deltaX = hexWidth - 1  - level + size;
         }
-        int deltaY = level;
-        return new Point(startX + deltaX, startY + deltaY);
+        return startX + deltaX;
     }
 
-    public static void addHexagon(TETile[][] world, Point lowerLeftPt, int side, TETile tile) {
+    /**
+     * Add hexagon at position lowerLeftPt which is lower left point of rectangle of added hexagon,
+     * then use tile to fill this added hexagon.
+     * */
+    public static void addHexagon(TETile[][] world, Point lowerLeftPt, int size, TETile tile) {
         // Check arguments.
         if (world == null) {
             throw new IllegalArgumentException("world cannot be null.");
         }
-        validateSide(side);
+        validateSide(size);
         if (tile == null) {
             throw new IllegalArgumentException("tile for constructing hexagon cannot be null.");
         }
 
         int worldWidth = world.length;
         int worldHeight = world[0].length;
-        int hexHeight = hexagonHeight(side);
+        int hexHeight = hexagonHeight(size);
         for (int level = 0; level < hexHeight; level++) {
             int hexY = lowerLeftPt.y + level;
             if (hexY < 0 || worldHeight <= hexHeight) {
                 continue;
             }
-            Point hexStartPt = hexagonStartPt(lowerLeftPt, side, level);
-            Point hexEndPt = hexagonEndPt(lowerLeftPt, side, level);
-            int hexStartX = hexStartPt.x;
-            int hexEndX = hexEndPt.x;
+            int hexStartX = hexagonStartX(lowerLeftPt, size, level);
+            int hexEndX = hexagonEndX(lowerLeftPt, size, level);
             for (int hexX = hexStartX; hexX <= hexEndX; hexX++) {
                 if (hexX < 0 || worldWidth <= hexX) {
                     continue;
