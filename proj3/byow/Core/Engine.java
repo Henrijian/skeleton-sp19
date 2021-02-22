@@ -4,10 +4,12 @@ import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
 public class Engine {
-    TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
+
+    TERenderer renderer = new TERenderer();
+    RectWorld world = new RectWorld(WIDTH, HEIGHT);
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
@@ -45,8 +47,11 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
-
+        renderer.initialize(WIDTH, HEIGHT);
+        int seed = Integer.valueOf(input);
+        world.randRooms(seed);
+        renderer.renderFrame(world.tiles);
         TETile[][] finalWorldFrame = null;
-        return finalWorldFrame;
+        return world.tiles;
     }
 }

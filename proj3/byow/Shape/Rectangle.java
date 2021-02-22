@@ -212,4 +212,9 @@ public class Rectangle implements Shape {
             throw new IllegalArgumentException("Unsupported shape for getting closest point on rectangle.");
         }
     }
+
+    @Override
+    public double area() {
+        return width * height;
+    }
 }

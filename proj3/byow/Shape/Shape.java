@@ -37,4 +37,9 @@ public interface Shape {
      * @return the closest point on this shape perimeter.
      */
     Point closestPointTo(Shape other);
+
+    /**
+     * Get the area of this shape.
+     */
+    double area();
 }
