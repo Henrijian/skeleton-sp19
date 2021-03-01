@@ -1,4 +1,6 @@
 package byow.Shape;
+import byow.TileEngine.TETile;
+
 import java.awt.*;
 
 public class Rectangle implements Shape {
@@ -162,7 +164,7 @@ public class Rectangle implements Shape {
             // The closest point is on the lower or the upper line of this rectangle.
             if (centerDeltaX < minDisjointDistX && centerDeltaY >= minDisjointDistY) {
                 int myMinX = myRect.leftBottomCorner.x;
-                int myMaxX = myRect.leftBottomCorner.x + myRect.width;
+                int myMaxX = myRect.leftBottomCorner.x + myRect.width - 1;
                 int otherMinX = otherRect.leftBottomCorner.x;
                 int closestX = myMinX;
                 if (myMinX <= otherMinX && otherMinX <= myMaxX) {
@@ -170,7 +172,7 @@ public class Rectangle implements Shape {
                 }
                 int closestY = myRect.leftBottomCorner.y;
                 if (myCenter.y < otherCenter.y) {
-                    closestY = myRect.leftBottomCorner.y + myRect.height;
+                    closestY = myRect.leftBottomCorner.y + myRect.height - 1;
                 }
                 closestPoint = new Point(closestX, closestY);
             }
@@ -178,11 +180,11 @@ public class Rectangle implements Shape {
             // The closest point is on the left or the right line of this rectangle.
             else if (centerDeltaY < minDisjointDistY && centerDeltaX >= minDisjointDistX) {
                 int myMinY = myRect.leftBottomCorner.y;
-                int myMaxY = myRect.leftBottomCorner.y + myRect.height;
+                int myMaxY = myRect.leftBottomCorner.y + myRect.height - 1;
                 int otherMinY = otherRect.leftBottomCorner.y;
                 int closestX = myRect.leftBottomCorner.x;
                 if (myCenter.x <= otherCenter.x) {
-                    closestX = myRect.leftBottomCorner.x + myRect.width;
+                    closestX = myRect.leftBottomCorner.x + myRect.width - 1;
                 }
                 int closestY = myMinY;
                 if (myMinY <= otherMinY && otherMinY <= myMaxY) {
@@ -195,11 +197,11 @@ public class Rectangle implements Shape {
             else if (centerDeltaX >= minDisjointDistX && centerDeltaY >= minDisjointDistY) {
                 int closestX = myRect.leftBottomCorner.x;
                 if (myCenter.x <= otherCenter.x) {
-                    closestX = myRect.leftBottomCorner.x + myRect.width;
+                    closestX = myRect.leftBottomCorner.x + myRect.width - 1;
                 }
                 int closestY = myRect.leftBottomCorner.y;
                 if (myCenter.y < otherCenter.y) {
-                    closestY = myRect.leftBottomCorner.y + myRect.height;
+                    closestY = myRect.leftBottomCorner.y + myRect.height - 1;
                 }
                 closestPoint = new Point(closestX, closestY);
             }
@@ -216,5 +218,28 @@ public class Rectangle implements Shape {
     @Override
     public double area() {
         return width * height;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof Rectangle)) {
+            return false;
+        }
+        Rectangle otherRect = (Rectangle) other;
+        return leftBottomCorner.equals(otherRect.leftBottomCorner)
+                && width == otherRect.width && height == otherRect.height;
+    }
+
+    @Override
+    public int hashCode() {
+        final int BASE = 31;
+        int result = 17;
+        result = result * BASE + leftBottomCorner.hashCode();
+        result = result * BASE + Integer.hashCode(width);
+        result = result * BASE + Integer.hashCode(height);
+        return result;
     }
 }

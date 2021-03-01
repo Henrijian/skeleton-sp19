@@ -92,5 +92,13 @@ public class RectRoomTest {
         diffDoorsRoom.addDoor(new Door(X + WIDTH, Y + HEIGHT - 1, CLOSED, OPENED, true));
         Assert.assertFalse(room.equals(diffDoorsRoom));
         Assert.assertFalse(room.hashCode() == diffDoorsRoom.hashCode());
+        final int DOOR_X = X + WIDTH;
+        final int DOOR_Y = Y;
+        room.addDoor(new Door(DOOR_X, DOOR_Y, CLOSED, OPENED, true));
+        RectRoom sameDoorsRoom = new RectRoom(X, Y, WIDTH, HEIGHT, FLOOR, WALL);
+        sameDoorsRoom.addDoor(new Door(DOOR_X, DOOR_Y, CLOSED, OPENED, true));
+        Assert.assertTrue(room.equals(sameDoorsRoom));
+        Assert.assertTrue(room.hashCode() == sameDoorsRoom.hashCode());
+
     }
 }

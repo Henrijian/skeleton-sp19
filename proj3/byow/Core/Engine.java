@@ -49,9 +49,9 @@ public class Engine {
         // that works for many different input types.
         renderer.initialize(WIDTH, HEIGHT);
         int seed = Integer.valueOf(input);
-        world.randRooms(seed);
-        renderer.renderFrame(world.tiles);
+        world.randWorld(seed);
+        renderer.renderFrame(world.tiles());
         TETile[][] finalWorldFrame = null;
-        return world.tiles;
+        return world.tiles();
     }
 }

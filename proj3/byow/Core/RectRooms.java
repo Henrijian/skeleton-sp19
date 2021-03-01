@@ -2,17 +2,15 @@ package byow.Core;
 
 import byow.TileEngine.TETile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
-public class RectRooms {
-    private final List<RectRoom> list;
+public class RectRooms extends LinkedList<RectRoom> {
     private int innerArea; // total inner area of all rooms.
     private int wallArea; // total wall area of all rooms.
 
     public RectRooms() {
-        this.list = new ArrayList<>();
         this.innerArea = 0;
+        this.wallArea = 0;
     }
 
     /**
@@ -24,14 +22,14 @@ public class RectRooms {
         if (newRoom == null) {
             return false;
         }
-        for (RectRoom room: list) {
+        for (RectRoom room: this) {
             if (room.overlapWith(newRoom)) {
                 return false;
             }
         }
         this.innerArea = this.innerArea + newRoom.innerArea();
         this.wallArea = this.wallArea + newRoom.wallArea();
-        return list.add(newRoom);
+        return super.add(newRoom);
     }
 
     /**
@@ -59,8 +57,9 @@ public class RectRooms {
      * Clear all rooms.
      */
     public void clear() {
-        list.clear();
-        innerArea = 0;
+        super.clear();
+        this.innerArea = 0;
+        this.wallArea = 0;
     }
 
     /**
@@ -77,8 +76,29 @@ public class RectRooms {
         if (tiles[0].length == 0) {
             return;
         }
-        for (RectRoom room: list) {
+        for (RectRoom room: this) {
+            room.fill(tiles);
+        }
+        for (RectRoom room: this) {
             room.fill(tiles);
         }
     }
+
+    /**
+     * Find the closest room to query room.
+     * @param room the query room.
+     */
+    public RectRoom closestTo(RectRoom room) {
+        RectRoom closetRoom = null;
+        double closetDistance = Integer.MAX_VALUE;
+        for (RectRoom otherRoom: this) {
+            double distance = otherRoom.outerShape().distanceTo(room.outerShape());
+            if (distance < closetDistance) {
+                closetRoom = otherRoom;
+                closetDistance = distance;
+            }
+        }
+        return closetRoom;
+    }
+
 }

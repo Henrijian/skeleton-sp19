@@ -121,19 +121,19 @@ public class RectangleTest {
         Assert.assertEquals(null, rect.closestPointTo(rect));
         // Top
         Rectangle topRect = new Rectangle(LEFT_X + 1, BOTTOM_Y + HEIGHT + 1 , WIDTH, HEIGHT);
-        Point topClosestPoint = new Point(topRect.leftBottomCorner.x, rect.leftBottomCorner.y+rect.height);
+        Point topClosestPoint = new Point(topRect.leftBottomCorner.x, rect.leftBottomCorner.y+rect.height-1);
         Assert.assertEquals(topClosestPoint, rect.closestPointTo(topRect));
         // Right top
         Rectangle rightTopRect = new Rectangle(LEFT_X + WIDTH + 1, BOTTOM_Y + HEIGHT + 1, WIDTH, HEIGHT);
-        Point rightTopClosestPoint = new Point(rect.leftBottomCorner.x+rect.width, rect.leftBottomCorner.y+rect.height);
+        Point rightTopClosestPoint = new Point(rect.leftBottomCorner.x+rect.width-1, rect.leftBottomCorner.y+rect.height-1);
         Assert.assertEquals(rightTopClosestPoint, rect.closestPointTo(rightTopRect));
         // Right
         Rectangle rightRect = new Rectangle(LEFT_X + WIDTH + 1, BOTTOM_Y + 1, WIDTH, HEIGHT);
-        Point rightClosestPoint = new Point(rect.leftBottomCorner.x+rect.width, rightRect.leftBottomCorner.y);
+        Point rightClosestPoint = new Point(rect.leftBottomCorner.x+rect.width-1, rightRect.leftBottomCorner.y);
         Assert.assertEquals(rightClosestPoint, rect.closestPointTo(rightRect));
         // Right bottom
         Rectangle rightBottomRect = new Rectangle(LEFT_X + WIDTH + 1, BOTTOM_Y - HEIGHT - 1, WIDTH, HEIGHT);
-        Point rightBottomClosestPoint = new Point(rect.leftBottomCorner.x+rect.width, rect.leftBottomCorner.y);
+        Point rightBottomClosestPoint = new Point(rect.leftBottomCorner.x+rect.width-1, rect.leftBottomCorner.y);
         Assert.assertEquals(rightBottomClosestPoint, rect.closestPointTo(rightBottomRect));
         // Bottom
         Rectangle bottomRect = new Rectangle(LEFT_X + 1, BOTTOM_Y - HEIGHT - 1,WIDTH, HEIGHT);
@@ -149,7 +149,7 @@ public class RectangleTest {
         Assert.assertEquals(leftClosestPoint, rect.closestPointTo(leftRect));
         // Left Top
         Rectangle leftTopRect = new Rectangle(LEFT_X - WIDTH - 1, BOTTOM_Y + HEIGHT + 1, WIDTH, HEIGHT);
-        Point leftTopClosestPoint = new Point(rect.leftBottomCorner.x, rect.leftBottomCorner.y+rect.height);
+        Point leftTopClosestPoint = new Point(rect.leftBottomCorner.x, rect.leftBottomCorner.y+rect.height-1);
         Assert.assertEquals(leftTopClosestPoint, rect.closestPointTo(leftTopRect));
     }
 }

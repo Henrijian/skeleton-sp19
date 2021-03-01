@@ -189,4 +189,38 @@ public class TETile {
 
         return copy;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof TETile)) {
+            return false;
+        }
+        TETile otherTile = (TETile) other;
+        boolean filePathSame;
+        if (filepath != null) {
+            filePathSame = filepath.equals(otherTile.filepath);
+        } else {
+            filePathSame = otherTile.filepath == null;
+        }
+        return character == otherTile.character && textColor.equals(otherTile.textColor)
+                && backgroundColor.equals(otherTile.backgroundColor) && description.equals(otherTile.description)
+                && filePathSame;
+    }
+
+    @Override
+    public int hashCode() {
+        final int BASE = 31;
+        int result = 17;
+        result = BASE * result + Character.hashCode(character);
+        result = BASE * result + textColor.hashCode();
+        result = BASE * result + backgroundColor.hashCode();
+        result = BASE * result + description.hashCode();
+        if (filepath != null) {
+            result = BASE * result + filepath.hashCode();
+        }
+        return result;
+    }
 }
