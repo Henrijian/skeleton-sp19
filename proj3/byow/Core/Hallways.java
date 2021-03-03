@@ -6,13 +6,13 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class HallWays extends HashSet<HallWay> {
+public class Hallways extends HashSet<Hallway> {
     /**
      * Add new hallway.
      * @param hallWay the hallway prepared for added.
      * @return True, if room is added to set, else false.
      */
-    public boolean add (HallWay hallWay) {
+    public boolean add (Hallway hallWay) {
         if (hallWay == null) {
             return false;
         }
@@ -57,8 +57,8 @@ public class HallWays extends HashSet<HallWay> {
                 blockedPosSet.add(blockPos);
             }
         }
-        HashMap<HallWay, List<Point>> hallwayTraces = new HashMap<>();
-        for (HallWay hallWay: this) {
+        HashMap<Hallway, List<Point>> hallwayTraces = new HashMap<>();
+        for (Hallway hallWay: this) {
             if (!PointUtils.inBoundary(hallWay.from, minX, minY, maxX, maxY)) {
                 continue;
             }
@@ -72,14 +72,14 @@ public class HallWays extends HashSet<HallWay> {
             hallwayTraces.put(hallWay, trace);
         }
         // Fill floor of hallway.
-        for (HallWay hallWay: hallwayTraces.keySet()) {
+        for (Hallway hallWay: hallwayTraces.keySet()) {
             List<Point> trace = hallwayTraces.get(hallWay);
             for (Point tracePos: trace) {
                 tiles[tracePos.x][tracePos.y] = floorTile;
             }
         }
         // Fill wall of hallway.
-        for (HallWay hallWay: hallwayTraces.keySet()) {
+        for (Hallway hallWay: hallwayTraces.keySet()) {
             List<Point> trace = hallwayTraces.get(hallWay);
             for (Point tracePos: trace) {
                 Point[] surroundPosList = PointUtils.surroundNeighbors(tracePos);

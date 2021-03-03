@@ -1,7 +1,6 @@
 package byow.Core;
 
 import byow.PriorityQueue.ArrayHeapMinPQ;
-import byow.Shape.Rectangle;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
@@ -17,7 +16,7 @@ public class RectWorld {
     private final int height; // Height of this world.
     private final TETile[][] tiles; // Tiles constructing this world.
     private final RectRooms rooms; // Rooms in this world.
-    private final HallWays hallWays; // Hallways in this world.
+    private final Hallways hallWays; // Hallways in this world.
 
     public RectWorld(int w, int h) {
         if (w <= 0) {
@@ -30,7 +29,7 @@ public class RectWorld {
         this.height = h;
         this.tiles = new TETile[w][h];
         this.rooms = new RectRooms();
-        this.hallWays = new HallWays();
+        this.hallWays = new Hallways();
 
         init();
     }
@@ -123,7 +122,7 @@ public class RectWorld {
                 roomDoors.put(neighborRoom, new HashSet<>());
             }
             roomDoors.get(neighborRoom).add(neighborDoor);
-            HallWay hallWay = new HallWay(myDoorPos, neighborDoorPos, FLOOR_TILE, WALL_TILE);
+            Hallway hallWay = new Hallway(myDoorPos, neighborDoorPos, FLOOR_TILE, WALL_TILE);
             hallWays.add(hallWay);
         }
         // Add door to room.

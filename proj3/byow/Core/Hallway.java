@@ -1,21 +1,19 @@
 package byow.Core;
 
-import byow.PriorityQueue.ArrayHeapMinPQ;
 import byow.TileEngine.TETile;
 
 import java.awt.*;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class HallWay {
+public class Hallway {
     public final Point from; // One end of hallway.
     public final Point to; // Another end of hallway.
     public final TETile floorTile; // Tile of hallway floor.
     public final TETile wallTile; // Tile of hallway wall.
 
-    public HallWay(Point from, Point to, TETile floor, TETile wall) {
+    public Hallway (Point from, Point to, TETile floor, TETile wall) {
         if (from == null) {
             throw new IllegalArgumentException("From position of hallway is null.");
         }
@@ -105,10 +103,10 @@ public class HallWay {
         if (other == this) {
             return true;
         }
-        if (!(other instanceof HallWay)) {
+        if (!(other instanceof Hallway)) {
             return false;
         }
-        HallWay otherHallway = (HallWay) other;
+        Hallway otherHallway = (Hallway) other;
         return from.equals(otherHallway.from) && to.equals(otherHallway.to)
                 && floorTile.equals(otherHallway.floorTile) && wallTile.equals(otherHallway.wallTile);
     }

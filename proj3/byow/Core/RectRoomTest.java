@@ -99,6 +99,5 @@ public class RectRoomTest {
         sameDoorsRoom.addDoor(new Door(DOOR_X, DOOR_Y, CLOSED, OPENED, true));
         Assert.assertTrue(room.equals(sameDoorsRoom));
         Assert.assertTrue(room.hashCode() == sameDoorsRoom.hashCode());
-
     }
 }
