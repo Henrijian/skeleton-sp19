@@ -1,5 +1,6 @@
-package byow.Core;
+package byow.Entity;
 
+import byow.Core.PointUtils;
 import byow.Shape.Rectangle;
 import byow.Shape.Relation;
 import byow.TileEngine.TETile;
@@ -7,7 +8,6 @@ import byow.TileEngine.TileUtils;
 
 import java.awt.*;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class RectRoom {

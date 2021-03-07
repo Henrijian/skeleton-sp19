@@ -1,4 +1,4 @@
-package byow.Core;
+package byow.Entity;
 
 import byow.PriorityQueue.ArrayHeapMinPQ;
 import byow.TileEngine.TETile;
@@ -7,7 +7,7 @@ import byow.TileEngine.Tileset;
 import java.awt.*;
 import java.util.*;
 
-public class RectWorld {
+public class World {
     private final TETile FLOOR_TILE = Tileset.FLOOR;
     private final TETile WALL_TILE = Tileset.WALL;
     private final TETile CLOSED_DOOR_TILE = Tileset.LOCKED_DOOR;
@@ -18,7 +18,7 @@ public class RectWorld {
     private final RectRooms rooms; // Rooms in this world.
     private final Hallways hallWays; // Hallways in this world.
 
-    public RectWorld(int w, int h) {
+    public World (int w, int h) {
         if (w <= 0) {
             throw new IllegalArgumentException("Width of world is not positive, width: " + w);
         }
@@ -51,7 +51,7 @@ public class RectWorld {
      * Randomly generating rooms in the world.
      * @param seed seed of randomness.
      */
-    private void randRooms(int seed) {
+    private void randRooms(long seed) {
         /* The world cannot contain the smallest room
            which is the room with one space and surrounding by wall. */
         if (this.width < 3 || this.height < 3) {
@@ -136,7 +136,7 @@ public class RectWorld {
      * Randomly creating the world.
      * @param seed seed of randomness.
      */
-    public void randWorld(int seed) {
+    public void randWorld(long seed) {
         init();
         randRooms(seed);
         connectRooms();

@@ -1,5 +1,6 @@
-package byow.Core;
+package byow.Entity;
 
+import byow.Core.PointUtils;
 import byow.TileEngine.TETile;
 
 import java.awt.*;

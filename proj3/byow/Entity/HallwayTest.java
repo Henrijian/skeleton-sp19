@@ -1,4 +1,4 @@
-package byow.Core;
+package byow.Entity;
 
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;

@@ -1,4 +1,4 @@
-package byow.Core;
+package byow.Entity;
 
 import byow.Shape.Rectangle;
 import byow.TileEngine.TETile;

@@ -1,11 +1,9 @@
-package byow.Core;
+package byow.Entity;
 
-import byow.PriorityQueue.ArrayHeapMinPQ;
+import byow.Core.PointUtils;
 import byow.TileEngine.TETile;
 
 import java.awt.*;
-import java.util.LinkedList;
-import java.util.Set;
 
 public class Door {
     public final int x; // X coordinate of this door.
