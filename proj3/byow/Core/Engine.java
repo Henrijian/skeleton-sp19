@@ -1,21 +1,40 @@
 package byow.Core;
 
-import byow.TileEngine.TERenderer;
+import byow.Entity.World;
+import byow.FrameEngine.Frame;
+import byow.FrameEngine.MainMenuFrame;
+import byow.FrameEngine.WorldFrame;
 import byow.TileEngine.TETile;
+
+import java.util.LinkedList;
 
 public class Engine {
     /* Feel free to change the width and height. */
-    public static final int WIDTH = 80;
-    public static final int HEIGHT = 30;
+    public static final int WORLD_WIDTH = 80;
+    public static final int WORLD_HEIGHT = 30;
+    public static final int FRAME_WIDTH = 1280;
+    public static final int FRAME_HEIGHT = 496;
 
-    TERenderer renderer = new TERenderer();
-    RectWorld world = new RectWorld(WIDTH, HEIGHT);
+    private Config config;
+
+    public Engine() {
+        this.config = new Config(WORLD_WIDTH, WORLD_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT);
+    }
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
+        LinkedList<Frame> frames = new LinkedList<>();
+        frames.addLast(new MainMenuFrame(config));
+        while (frames.size() > 0) {
+            Frame frame = frames.removeFirst();
+            frame.start();
+            if (frame.possibleNextFrame()) {
+                frames.addLast(frame.getNextFrame());
+            }
+        }
     }
 
     /**
@@ -47,11 +66,9 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
-        renderer.initialize(WIDTH, HEIGHT);
-        int seed = Integer.valueOf(input);
+        long seed = Long.parseLong(input);
+        World world = new World(WORLD_WIDTH, WORLD_HEIGHT);
         world.randWorld(seed);
-        renderer.renderFrame(world.tiles());
-        TETile[][] finalWorldFrame = null;
         return world.tiles();
     }
 }

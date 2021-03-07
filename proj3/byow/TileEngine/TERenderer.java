@@ -12,11 +12,29 @@ import java.awt.Font;
  * allowing scrolling of the screen or tracking the avatar or something similar.
  */
 public class TERenderer {
-    private static final int TILE_SIZE = 16;
     private int width;
     private int height;
     private int xOffset;
     private int yOffset;
+    private int tileSize;
+
+    public void initialize(int w, int h, int xOff, int yOff, int tSize) {
+        this.width = w;
+        this.height = h;
+        this.xOffset = xOff;
+        this.yOffset = yOff;
+        this.tileSize = tSize;
+        StdDraw.setCanvasSize(width * tileSize, height * tileSize);
+        Font font = new Font("Monaco", Font.BOLD, tileSize - 2);
+        StdDraw.setFont(font);
+        StdDraw.setXscale(0, width);
+        StdDraw.setYscale(0, height);
+
+        StdDraw.clear(new Color(0, 0, 0));
+
+        StdDraw.enableDoubleBuffering();
+        StdDraw.show();
+    }
 
     /**
      * Same functionality as the other initialization method. The only difference is that the xOff
@@ -28,20 +46,8 @@ public class TERenderer {
      * @param h height of the window in tiles.
      */
     public void initialize(int w, int h, int xOff, int yOff) {
-        this.width = w;
-        this.height = h;
-        this.xOffset = xOff;
-        this.yOffset = yOff;
-        StdDraw.setCanvasSize(width * TILE_SIZE, height * TILE_SIZE);
-        Font font = new Font("Monaco", Font.BOLD, TILE_SIZE - 2);
-        StdDraw.setFont(font);      
-        StdDraw.setXscale(0, width);
-        StdDraw.setYscale(0, height);
-
-        StdDraw.clear(new Color(0, 0, 0));
-
-        StdDraw.enableDoubleBuffering();
-        StdDraw.show();
+        final int DEFAULT_TILE_SIZE = 16;
+        initialize(w, h, xOff, yOff, DEFAULT_TILE_SIZE);
     }
 
     /**
@@ -58,7 +64,9 @@ public class TERenderer {
      * @param h height of the window in tiles.
      */
     public void initialize(int w, int h) {
-        initialize(w, h, 0, 0);
+        final int DEFAULT_X_OFFSET = 0;
+        final int DEFAULT_Y_OFFSET = 0;
+        initialize(w, h, DEFAULT_X_OFFSET, DEFAULT_Y_OFFSET);
     }
 
     /**
