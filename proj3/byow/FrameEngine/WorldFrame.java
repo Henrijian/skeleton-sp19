@@ -25,6 +25,7 @@ public class WorldFrame extends BaseFrame {
     private final int maxY;
     private final int tileSize;
     private final World world;
+    private final TETile[][] tiles;
     private Mode mode;
     private String inputCommand;
 
@@ -51,7 +52,6 @@ public class WorldFrame extends BaseFrame {
         }
     }
 
-
     public WorldFrame(Config config, long seed) {
         super(config);
         this.minX = 0;
@@ -66,6 +66,7 @@ public class WorldFrame extends BaseFrame {
         StdDraw.setYscale(minY, maxY);
         this.world = new World(config.worldWidth, config.worldHeight);
         this.world.randWorld(seed);
+        this.tiles = world.tiles();
         this.mode = Mode.QUERY_DIRECTION;
         this.inputCommand = "";
     }
@@ -79,16 +80,21 @@ public class WorldFrame extends BaseFrame {
         double statusBarCenterX = minX + (statusBarWidth / 2);
         double statusBarCenterY =  maxY - (statusBarHeight / 2);
         StdDraw.filledRectangle(statusBarCenterX, statusBarCenterY, statusBarWidth / 2, statusBarHeight / 2);
-        // Draw current mouse coordinate.
+        // Draw mouse currently pointing tile.
         final Color PEN_COLOR = Color.WHITE;
         StdDraw.setPenColor(PEN_COLOR);
         final Font STATUS_TEXT_FONT = new Font("Monaco", Font.BOLD, tileSize - 2);
         StdDraw.setFont(STATUS_TEXT_FONT);
-        final int FLOAT_POINT_NUM = 4;
-        String mouseXStr = String.format("%."+FLOAT_POINT_NUM+"f", StdDraw.mouseX());
-        String mouseYStr = String.format("%."+FLOAT_POINT_NUM+"f", StdDraw.mouseY());
-        String mouseCoordinateStr = String.format("(%s, %s)", mouseXStr, mouseYStr);
-        StdDraw.textLeft(minX, statusBarCenterY, mouseCoordinateStr);
+        int tileX = (int) Math.floor(StdDraw.mouseX());
+        int tileY = (int) Math.floor(StdDraw.mouseY());
+        String tileStr;
+        if (0 < tiles.length && tileX < tiles.length && tileY < tiles[0].length) {
+            tileStr = tiles[tileX][tileY].description();
+        } else {
+            tileStr = "";
+        }
+        StdDraw.textLeft(minX, statusBarCenterY, tileStr);
+        // Draw bottom line of status bar.
         final double STATUS_BAR_BOTTOM_LINE_Y = maxY - STATUS_BAR_ROW_COUNT;
         StdDraw.line(minX, STATUS_BAR_BOTTOM_LINE_Y, maxX, STATUS_BAR_BOTTOM_LINE_Y);
         StdDraw.show();

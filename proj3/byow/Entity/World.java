@@ -1,6 +1,7 @@
 package byow.Entity;
 
 import byow.PriorityQueue.ArrayHeapMinPQ;
+import byow.Shape.Rectangle;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
@@ -12,11 +13,13 @@ public class World {
     private final TETile WALL_TILE = Tileset.WALL;
     private final TETile CLOSED_DOOR_TILE = Tileset.LOCKED_DOOR;
     private final TETile OPENED_DOOR_TILE = Tileset.UNLOCKED_DOOR;
+    private final TETile AVATAR_TILE = Tileset.AVATAR;
     private final int width; // Width of this world.
     private final int height; // Height of this world.
     private final TETile[][] tiles; // Tiles constructing this world.
     private final RectRooms rooms; // Rooms in this world.
     private final Hallways hallWays; // Hallways in this world.
+    private final Point userPosition; // Position of user in world.
 
     public World (int w, int h) {
         if (w <= 0) {
@@ -30,6 +33,7 @@ public class World {
         this.tiles = new TETile[w][h];
         this.rooms = new RectRooms();
         this.hallWays = new Hallways();
+        this.userPosition = new Point(0, 0);
 
         init();
     }
@@ -45,6 +49,8 @@ public class World {
         }
         rooms.clear();
         hallWays.clear();
+        userPosition.x = 0;
+        userPosition.y = 0;
     }
 
     /**
@@ -78,6 +84,23 @@ public class World {
                 attempts = attempts + 1;
             }
         }
+    }
+
+    /**
+     * Put user at randomly choose room.
+     */
+    private void randUser(long seed) {
+        if (rooms.size() == 0) {
+            return;
+        }
+        Random random = new Random(seed);
+        int randRoomIdx = random.nextInt(rooms.size());
+        RectRoom room = rooms.get(randRoomIdx);
+        Rectangle innerSpace = room.innerShape();
+        int randX = random.nextInt(innerSpace.leftBottomCorner.x + innerSpace.width);
+        int randY = random.nextInt(innerSpace.leftBottomCorner.y + innerSpace.height);
+        userPosition.x = randX;
+        userPosition.y = randY;
     }
 
     /**
@@ -139,8 +162,10 @@ public class World {
     public void randWorld(long seed) {
         init();
         randRooms(seed);
+        randUser(seed);
         connectRooms();
         rooms.fill(tiles);
+        tiles[userPosition.x][userPosition.y] = AVATAR_TILE;
         HashSet<TETile> blocks = new HashSet<>();
         blocks.add(WALL_TILE);
         hallWays.fill(tiles, blocks, FLOOR_TILE, WALL_TILE);
