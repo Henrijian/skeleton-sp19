@@ -3,11 +3,13 @@ package byow.FrameEngine;
 import byow.Core.Config;
 import byow.Entity.World;
 import byow.Input.KeyboardInput;
+import byow.Shape.Direction;
 import byow.TileEngine.TETile;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,25 +19,29 @@ public class WorldFrame extends BaseFrame {
      */
     private final int STATUS_BAR_ROW_COUNT = 1;
     /**
-     * Side size of tile(square) in pixel.
+     * Key, if pressed, trigger the frame into query command mode.
+     */
+    private final char QUERY_COMMAND_KEY = ':';
+    /**
+     * Command for quitting game.
+     */
+    private final String QUIT_GAME_COMMAND = Character.toString(QUERY_COMMAND_KEY) + 'q';
+    /**
+     * Boundary coordinate of canvas.
      */
     private final int minX;
     private final int maxX;
     private final int minY;
     private final int maxY;
+    /**
+     * Side size of tile(square) in pixel.
+     */
     private final int tileSize;
     private final World world;
     private final TETile[][] tiles;
-    private Mode mode;
-    private String inputCommand;
-
-    private enum Direction {
-        UP, RIGHT, BOTTOM, LEFT
-    }
-
-    private enum Mode {
-        QUERY_DIRECTION, QUERY_COMMAND
-    }
+    private final HashMap<Character, Direction> directionKeyMap;
+    private boolean inQueryCommandMode;
+    private StringBuilder inputCommandSB;
 
     private class RefreshTask extends TimerTask {
         private final Runnable command;
@@ -67,8 +73,13 @@ public class WorldFrame extends BaseFrame {
         this.world = new World(config.worldWidth, config.worldHeight);
         this.world.randWorld(seed);
         this.tiles = world.tiles();
-        this.mode = Mode.QUERY_DIRECTION;
-        this.inputCommand = "";
+        this.directionKeyMap = new HashMap<>();
+        directionKeyMap.put('w', Direction.TOP);
+        directionKeyMap.put('d', Direction.RIGHT);
+        directionKeyMap.put('s', Direction.BOTTOM);
+        directionKeyMap.put('a', Direction.LEFT);
+        this.inQueryCommandMode = false;
+        this.inputCommandSB = new StringBuilder();
     }
 
     private void showStatus() {
@@ -80,20 +91,25 @@ public class WorldFrame extends BaseFrame {
         double statusBarCenterX = minX + (statusBarWidth / 2);
         double statusBarCenterY =  maxY - (statusBarHeight / 2);
         StdDraw.filledRectangle(statusBarCenterX, statusBarCenterY, statusBarWidth / 2, statusBarHeight / 2);
-        // Draw mouse currently pointing tile.
+        // Draw status text
         final Color PEN_COLOR = Color.WHITE;
         StdDraw.setPenColor(PEN_COLOR);
         final Font STATUS_TEXT_FONT = new Font("Monaco", Font.BOLD, tileSize - 2);
         StdDraw.setFont(STATUS_TEXT_FONT);
-        int tileX = (int) Math.floor(StdDraw.mouseX());
-        int tileY = (int) Math.floor(StdDraw.mouseY());
-        String tileStr;
-        if (0 < tiles.length && tileX < tiles.length && tileY < tiles[0].length) {
-            tileStr = tiles[tileX][tileY].description();
+        String statusText;
+        if (inQueryCommandMode) {
+            statusText = inputCommandSB.toString();
         } else {
-            tileStr = "";
+            // Draw mouse currently pointing tile.
+            int tileX = (int) Math.floor(StdDraw.mouseX());
+            int tileY = (int) Math.floor(StdDraw.mouseY());
+            if (0 < tiles.length && tileX < tiles.length && tileY < tiles[0].length) {
+                statusText = tiles[tileX][tileY].description();
+            } else {
+                statusText = "";
+            }
         }
-        StdDraw.textLeft(minX, statusBarCenterY, tileStr);
+        StdDraw.textLeft(minX, statusBarCenterY, statusText);
         // Draw bottom line of status bar.
         final double STATUS_BAR_BOTTOM_LINE_Y = maxY - STATUS_BAR_ROW_COUNT;
         StdDraw.line(minX, STATUS_BAR_BOTTOM_LINE_Y, maxX, STATUS_BAR_BOTTOM_LINE_Y);
@@ -106,8 +122,8 @@ public class WorldFrame extends BaseFrame {
         // Draw world tiles background.
         final Color WORLD_COLOR = Color.BLACK;
         StdDraw.setPenColor(WORLD_COLOR);
-        double worldWidth = maxX - minX + 1;
-        double worldHeight = maxY - minY + 1 - STATUS_BAR_ROW_COUNT;
+        double worldWidth = maxX - minX;
+        double worldHeight = maxY - minY - STATUS_BAR_ROW_COUNT;
         double worldCenterX = (minX + maxX) / 2;
         double worldCenterY = (minY + maxY - STATUS_BAR_ROW_COUNT) / 2;
         StdDraw.filledRectangle(worldCenterX, worldCenterY, worldWidth / 2, worldHeight / 2);
@@ -147,7 +163,23 @@ public class WorldFrame extends BaseFrame {
             KeyboardInput keyboardInput = new KeyboardInput(true);
             while (keyboardInput.possibleNextInput()) {
                 char gotKey = Character.toLowerCase(keyboardInput.getNextKey());
-                break;
+                if (inQueryCommandMode) {
+                    inputCommandSB.append(gotKey);
+                    String inputCommand = inputCommandSB.toString();
+                    if (inputCommand.equals(QUIT_GAME_COMMAND)) {
+                        showStatus();
+                        return;
+                    }
+                } else {
+                    if (gotKey == QUERY_COMMAND_KEY) {
+                        inQueryCommandMode = true;
+                        inputCommandSB.append(gotKey);
+                    } else if (directionKeyMap.containsKey(gotKey)) {
+                        Direction moveDirection = directionKeyMap.get(gotKey);
+                        world.moveUser(moveDirection);
+                        showWorldTiles();
+                    }
+                }
             }
         } finally {
             refreshTimer.cancel();

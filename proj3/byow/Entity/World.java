@@ -1,6 +1,7 @@
 package byow.Entity;
 
 import byow.PriorityQueue.ArrayHeapMinPQ;
+import byow.Shape.Direction;
 import byow.Shape.Rectangle;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
@@ -17,6 +18,7 @@ public class World {
     private final int width; // Width of this world.
     private final int height; // Height of this world.
     private final TETile[][] tiles; // Tiles constructing this world.
+    private final Set<TETile> blocks; // Block of tiles that the user cannot pass.
     private final RectRooms rooms; // Rooms in this world.
     private final Hallways hallWays; // Hallways in this world.
     private final Point userPosition; // Position of user in world.
@@ -31,6 +33,9 @@ public class World {
         this.width = w;
         this.height = h;
         this.tiles = new TETile[w][h];
+        this.blocks = new HashSet<>();
+        blocks.add(WALL_TILE);
+        blocks.add(CLOSED_DOOR_TILE);
         this.rooms = new RectRooms();
         this.hallWays = new Hallways();
         this.userPosition = new Point(0, 0);
@@ -165,17 +170,63 @@ public class World {
         randUser(seed);
         connectRooms();
         rooms.fill(tiles);
-        tiles[userPosition.x][userPosition.y] = AVATAR_TILE;
-        HashSet<TETile> blocks = new HashSet<>();
-        blocks.add(WALL_TILE);
         hallWays.fill(tiles, blocks, FLOOR_TILE, WALL_TILE);
     }
 
+    /**
+     * Tiles of current world.
+     * @return copied tiles of current world.
+     */
     public TETile[][] tiles() {
         TETile[][] result = new TETile[width][height];
+        // Fill world.
         for (int x = 0; x < width; x++) {
             if (height >= 0) System.arraycopy(this.tiles[x], 0, result[x], 0, height);
         }
+        // Fill user.
+        result[userPosition.x][userPosition.y] = AVATAR_TILE;
         return result;
+    }
+
+    public void moveUser(Direction direction) {
+        int deltaX = 0;
+        int deltaY = 0;
+        switch (direction) {
+            case TOP -> deltaY += 1;
+            case RIGHT_TOP -> {
+                deltaX += 1;
+                deltaY += 1;
+            }
+            case RIGHT -> deltaX += 1;
+            case RIGHT_BOTTOM -> {
+                deltaX += 1;
+                deltaY -= 1;
+            }
+            case BOTTOM -> deltaY -= 1;
+            case LEFT_BOTTOM -> {
+                deltaX -= 1;
+                deltaY -= 1;
+            }
+            case LEFT -> deltaX -= 1;
+            case LEFT_TOP -> {
+                deltaX -= 1;
+                deltaY += 1;
+            }
+        }
+        int newUserX = userPosition.x + deltaX;
+        if (newUserX < 0 || width <= newUserX) {
+            newUserX = userPosition.x;
+        }
+        int newUserY = userPosition.y + deltaY;
+        if (newUserY < 0 || height <= newUserY) {
+            newUserY = userPosition.y;
+        }
+        TETile newUserTile = tiles[newUserX][newUserY];
+        if (blocks.contains(newUserTile)) {
+            newUserX = userPosition.x;
+            newUserY = userPosition.y;
+        }
+        userPosition.x = newUserX;
+        userPosition.y = newUserY;
     }
 }
