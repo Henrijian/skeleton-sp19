@@ -66,18 +66,10 @@ public class MainMenuFrame extends BaseFrame {
             MenuItem selectedItem = menuItemKeyMap.get(gotKey);
             boolean finished = true;
             switch (selectedItem) {
-                case NEW_GAME:
-                    nextFrame = new NewGameFrame(config);
-                    break;
-                case LOAD_GAME:
-                    nextFrame = null;
-                    break;
-                case QUIT:
-                    nextFrame = null;
-                    break;
-                default:
-                    finished = false;
-                    break;
+                case NEW_GAME -> nextFrame = new NewGameFrame(config);
+                case LOAD_GAME -> nextFrame = new LoadGameFrame(config);
+                case QUIT -> System.exit(0);
+                default -> finished = false;
             }
             if (finished) {
                 return;

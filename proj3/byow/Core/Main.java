@@ -16,7 +16,6 @@ public class Main {
         } else {
             Engine engine = new Engine();
             engine.interactWithKeyboard();
-            System.exit(0);
         }
     }
 }

@@ -4,8 +4,9 @@ import byow.Core.PointUtils;
 import byow.TileEngine.TETile;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public class Door {
+public class Door implements Serializable {
     public final int x; // X coordinate of this door.
     public final int y; // Y coordinate of this door.
     public final TETile closedTile; // Tile represents closed door.

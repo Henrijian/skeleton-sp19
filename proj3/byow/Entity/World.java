@@ -7,9 +7,10 @@ import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.*;
 
-public class World {
+public class World implements Serializable {
     private final TETile FLOOR_TILE = Tileset.FLOOR;
     private final TETile WALL_TILE = Tileset.WALL;
     private final TETile CLOSED_DOOR_TILE = Tileset.LOCKED_DOOR;
@@ -186,6 +187,22 @@ public class World {
         // Fill user.
         result[userPosition.x][userPosition.y] = AVATAR_TILE;
         return result;
+    }
+
+    /**
+     * Width of this world.
+     * @return width of this world in tile count.
+     */
+    public int width() {
+        return width;
+    }
+
+    /**
+     * Height of this world.
+     * @return height of this world in tile count.
+     */
+    public int height() {
+        return height;
     }
 
     public void moveUser(Direction direction) {

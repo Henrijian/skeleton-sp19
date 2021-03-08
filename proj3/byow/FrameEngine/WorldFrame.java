@@ -8,6 +8,7 @@ import byow.TileEngine.TETile;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
+import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Timer;
@@ -25,7 +26,7 @@ public class WorldFrame extends BaseFrame {
     /**
      * Command for quitting game.
      */
-    private final String QUIT_GAME_COMMAND = Character.toString(QUERY_COMMAND_KEY) + 'q';
+    private final char QUIT_GAME_COMMAND = 'q';
     /**
      * Boundary coordinate of canvas.
      */
@@ -41,7 +42,7 @@ public class WorldFrame extends BaseFrame {
     private final TETile[][] tiles;
     private final HashMap<Character, Direction> directionKeyMap;
     private boolean inQueryCommandMode;
-    private StringBuilder inputCommandSB;
+    private final StringBuilder inputCommandSB;
 
     private class RefreshTask extends TimerTask {
         private final Runnable command;
@@ -58,6 +59,23 @@ public class WorldFrame extends BaseFrame {
         }
     }
 
+    public WorldFrame(Config config, World world) {
+        super(config);
+        if (world == null) {
+            throw new IllegalArgumentException("Cannot instantiate world frame with null world.");
+        }
+        this.minX = 0;
+        this.maxX = world.width();
+        this.minY = 0;
+        this.maxY = world.height() + STATUS_BAR_ROW_COUNT;
+        this.tileSize = width() / world.width();
+        this.world = world;
+        this.tiles = world.tiles();
+        this.directionKeyMap = new HashMap<>();
+        this.inputCommandSB = new StringBuilder();
+        initialize();
+    }
+
     public WorldFrame(Config config, long seed) {
         super(config);
         this.minX = 0;
@@ -67,19 +85,25 @@ public class WorldFrame extends BaseFrame {
         int sizeX = maxX - minX + 1;
         int sizeY = maxY - minY + 1;
         this.tileSize = Math.min(width() / sizeX, height() / sizeY);
-        StdDraw.setCanvasSize(width(), height());
-        StdDraw.setXscale(minX, maxX);
-        StdDraw.setYscale(minY, maxY);
         this.world = new World(config.worldWidth, config.worldHeight);
         this.world.randWorld(seed);
         this.tiles = world.tiles();
         this.directionKeyMap = new HashMap<>();
+        this.inputCommandSB = new StringBuilder();
+        initialize();
+    }
+
+    private void initialize() {
+        StdDraw.setCanvasSize(width(), height());
+        StdDraw.setXscale(minX, maxX);
+        StdDraw.setYscale(minY, maxY);
+        directionKeyMap.clear();
         directionKeyMap.put('w', Direction.TOP);
         directionKeyMap.put('d', Direction.RIGHT);
         directionKeyMap.put('s', Direction.BOTTOM);
         directionKeyMap.put('a', Direction.LEFT);
         this.inQueryCommandMode = false;
-        this.inputCommandSB = new StringBuilder();
+        this.inputCommandSB.setLength(0);
     }
 
     private void showStatus() {
@@ -165,10 +189,10 @@ public class WorldFrame extends BaseFrame {
                 char gotKey = Character.toLowerCase(keyboardInput.getNextKey());
                 if (inQueryCommandMode) {
                     inputCommandSB.append(gotKey);
-                    String inputCommand = inputCommandSB.toString();
-                    if (inputCommand.equals(QUIT_GAME_COMMAND)) {
-                        showStatus();
-                        return;
+                    if (gotKey == QUIT_GAME_COMMAND) {
+                        // Save and exit.
+                        saveWorld();
+                        System.exit(0);
                     }
                 } else {
                     if (gotKey == QUERY_COMMAND_KEY) {
@@ -183,6 +207,22 @@ public class WorldFrame extends BaseFrame {
             }
         } finally {
             refreshTimer.cancel();
+        }
+    }
+
+    private void saveWorld() {
+        File file = new File(config.FILE_NAME);
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            FileOutputStream fileOutStream = new FileOutputStream(file);
+            ObjectOutputStream objectOutStream = new ObjectOutputStream(fileOutStream);
+            objectOutStream.writeObject(world);
+        }  catch (FileNotFoundException e) {
+            System.out.println("file not found");
+        } catch (IOException e) {
+            System.out.println(e);
         }
     }
 }

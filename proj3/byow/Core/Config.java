@@ -1,10 +1,11 @@
 package byow.Core;
 
 public class Config {
-    public int worldWidth;
-    public int worldHeight;
-    public int frameWidth;
-    public int frameHeight;
+    public final String FILE_NAME = ".save_data";
+    public final int worldWidth;
+    public final int worldHeight;
+    public final int frameWidth;
+    public final int frameHeight;
 
     public Config(int worldWidth, int worldHeight, int frameWidth, int frameHeight) {
         if (worldWidth <= 0) {

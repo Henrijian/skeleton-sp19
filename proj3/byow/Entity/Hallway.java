@@ -4,11 +4,12 @@ import byow.Core.PointUtils;
 import byow.TileEngine.TETile;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Hallway {
+public class Hallway implements Serializable {
     public final Point from; // One end of hallway.
     public final Point to; // Another end of hallway.
     public final TETile floorTile; // Tile of hallway floor.

@@ -7,10 +7,11 @@ import byow.TileEngine.TETile;
 import byow.TileEngine.TileUtils;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class RectRoom {
+public class RectRoom implements Serializable {
     public final int x; // x coordinate of bottom-left corner.
     public final int y; // y coordinate of bottom-left corner.
     public final int width; // width of rectangle room(not including wall).
