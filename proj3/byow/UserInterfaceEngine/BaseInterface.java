@@ -1,4 +1,4 @@
-package byow.InterfaceEngine;
+package byow.UserInterfaceEngine;
 
 import byow.Core.Config;
 import edu.princeton.cs.introcs.StdDraw;

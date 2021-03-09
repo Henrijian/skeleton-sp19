@@ -3,9 +3,9 @@ package byow.Core;
 import byow.Input.InputDevice;
 import byow.Input.KeyboardInput;
 import byow.Input.StringInput;
-import byow.InterfaceEngine.UserInterface;
-import byow.InterfaceEngine.MainMenuInterface;
-import byow.InterfaceEngine.WorldInterface;
+import byow.UserInterfaceEngine.UserInterface;
+import byow.UserInterfaceEngine.MainMenuInterface;
+import byow.UserInterfaceEngine.WorldInterface;
 import byow.TileEngine.TETile;
 
 import java.util.LinkedList;

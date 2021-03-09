@@ -1,4 +1,4 @@
-package byow.InterfaceEngine;
+package byow.UserInterfaceEngine;
 
 import byow.Core.Config;
 import byow.Entity.World;
@@ -203,6 +203,7 @@ public class WorldInterface extends BaseInterface {
                     if (gotKey == QUIT_GAME_COMMAND) {
                         // Save and exit.
                         saveWorld();
+                        TETile.toString(world.tiles());
                         System.exit(0);
                     }
                 } else {

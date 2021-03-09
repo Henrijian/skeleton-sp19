@@ -1,4 +1,4 @@
-package byow.InterfaceEngine;
+package byow.UserInterfaceEngine;
 
 import byow.Input.InputDevice;
 
