@@ -1,8 +1,8 @@
-package byow.FrameEngine;
+package byow.InterfaceEngine;
 
 import byow.Core.Config;
 import byow.Entity.World;
-import byow.Input.KeyboardInput;
+import byow.Input.InputDevice;
 import byow.Shape.Direction;
 import byow.TileEngine.TETile;
 import edu.princeton.cs.introcs.StdDraw;
@@ -14,13 +14,13 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class WorldFrame extends BaseFrame {
+public class WorldInterface extends BaseInterface {
     /**
      * Status bar height in row count.
      */
     private final int STATUS_BAR_ROW_COUNT = 1;
     /**
-     * Key, if pressed, trigger the frame into query command mode.
+     * Key, if pressed, trigger the userInterface into query command mode.
      */
     private final char QUERY_COMMAND_KEY = ':';
     /**
@@ -59,10 +59,10 @@ public class WorldFrame extends BaseFrame {
         }
     }
 
-    public WorldFrame(Config config, World world) {
+    public WorldInterface(Config config, World world) {
         super(config);
         if (world == null) {
-            throw new IllegalArgumentException("Cannot instantiate world frame with null world.");
+            throw new IllegalArgumentException("Cannot instantiate world userInterface with null world.");
         }
         this.minX = 0;
         this.maxX = world.width();
@@ -76,7 +76,7 @@ public class WorldFrame extends BaseFrame {
         initialize();
     }
 
-    public WorldFrame(Config config, long seed) {
+    public WorldInterface(Config config, long seed) {
         super(config);
         this.minX = 0;
         this.maxX = config.worldWidth;
@@ -94,19 +94,23 @@ public class WorldFrame extends BaseFrame {
     }
 
     private void initialize() {
-        StdDraw.setCanvasSize(width(), height());
-        StdDraw.setXscale(minX, maxX);
-        StdDraw.setYscale(minY, maxY);
-        directionKeyMap.clear();
         directionKeyMap.put('w', Direction.TOP);
         directionKeyMap.put('d', Direction.RIGHT);
         directionKeyMap.put('s', Direction.BOTTOM);
         directionKeyMap.put('a', Direction.LEFT);
-        this.inQueryCommandMode = false;
-        this.inputCommandSB.setLength(0);
+        inQueryCommandMode = false;
+        inputCommandSB.setLength(0);
+        if (!config.hideInterface) {
+            StdDraw.setCanvasSize(width(), height());
+            StdDraw.setXscale(minX, maxX);
+            StdDraw.setYscale(minY, maxY);
+        }
     }
 
     private void showStatus() {
+        if (config.hideInterface) {
+            return;
+        }
         // Draw status bar background.
         final Color STATUS_BAR_COLOR = Color.BLACK;
         StdDraw.setPenColor(STATUS_BAR_COLOR);
@@ -141,8 +145,10 @@ public class WorldFrame extends BaseFrame {
     }
 
     private void showWorldTiles() {
+        if (config.hideInterface) {
+            return;
+        }
         TETile[][] worldTiles = world.tiles();
-
         // Draw world tiles background.
         final Color WORLD_COLOR = Color.BLACK;
         StdDraw.setPenColor(WORLD_COLOR);
@@ -171,6 +177,9 @@ public class WorldFrame extends BaseFrame {
 
     @Override
     public void show() {
+        if (config.hideInterface) {
+            return;
+        }
         final Color BACKGROUND_COLOR = Color.BLACK;
         StdDraw.clear(BACKGROUND_COLOR);
         showStatus();
@@ -178,15 +187,17 @@ public class WorldFrame extends BaseFrame {
     }
 
     @Override
-    public void start() {
+    public void start(InputDevice inputDevice) {
+        if (inputDevice == null) {
+            throw new IllegalArgumentException("No input to world interface.");
+        }
         show();
         TimerTask refreshStatusTask = new RefreshTask(this::showStatus);
         Timer refreshTimer = new Timer();
         try {
             refreshTimer.scheduleAtFixedRate(refreshStatusTask, new Date(), 100);
-            KeyboardInput keyboardInput = new KeyboardInput(true);
-            while (keyboardInput.possibleNextInput()) {
-                char gotKey = Character.toLowerCase(keyboardInput.getNextKey());
+            while (inputDevice.possibleNextInput()) {
+                char gotKey = Character.toLowerCase(inputDevice.getNextKey());
                 if (inQueryCommandMode) {
                     inputCommandSB.append(gotKey);
                     if (gotKey == QUIT_GAME_COMMAND) {
@@ -210,6 +221,9 @@ public class WorldFrame extends BaseFrame {
         }
     }
 
+    /**
+     * Save current world object to file.
+     */
     private void saveWorld() {
         File file = new File(config.FILE_NAME);
         try {
@@ -224,5 +238,12 @@ public class WorldFrame extends BaseFrame {
         } catch (IOException e) {
             System.out.println(e);
         }
+    }
+
+    /**
+     * Current state of world's tiles.
+     */
+    public TETile[][] worldTiles() {
+        return world.tiles();
     }
 }

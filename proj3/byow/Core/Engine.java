@@ -1,9 +1,11 @@
 package byow.Core;
 
-import byow.Entity.World;
-import byow.FrameEngine.Frame;
-import byow.FrameEngine.MainMenuFrame;
-import byow.FrameEngine.WorldFrame;
+import byow.Input.InputDevice;
+import byow.Input.KeyboardInput;
+import byow.Input.StringInput;
+import byow.InterfaceEngine.UserInterface;
+import byow.InterfaceEngine.MainMenuInterface;
+import byow.InterfaceEngine.WorldInterface;
 import byow.TileEngine.TETile;
 
 import java.util.LinkedList;
@@ -15,10 +17,34 @@ public class Engine {
     public static final int FRAME_WIDTH = 1280;
     public static final int FRAME_HEIGHT = 496;
 
-    private Config config;
+    private final Config config;
+    private TETile[][] worldTiles; // Tiles of world representing last state of world.
 
     public Engine() {
-        this.config = new Config(WORLD_WIDTH, WORLD_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT);
+        this.config = new Config(WORLD_WIDTH, WORLD_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT, false);
+        this.worldTiles = null;
+    }
+
+    /**
+     * Executing engine by specified input.
+     * @param input input.
+     */
+    private void start(InputDevice input) {
+        if (input == null) {
+            throw new IllegalArgumentException("Cannot start engine with null input.");
+        }
+        LinkedList<UserInterface> userInterfaces = new LinkedList<>();
+        userInterfaces.addLast(new MainMenuInterface(config));
+        while (userInterfaces.size() > 0) {
+            UserInterface userInterface = userInterfaces.removeFirst();
+            userInterface.start(input);
+            if (userInterface instanceof WorldInterface) {
+                this.worldTiles = ((WorldInterface) userInterface).worldTiles();
+            }
+            if (userInterface.possibleNextInterface()) {
+                userInterfaces.addLast(userInterface.getNextInterface());
+            }
+        }
     }
 
     /**
@@ -26,15 +52,8 @@ public class Engine {
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
-        LinkedList<Frame> frames = new LinkedList<>();
-        frames.addLast(new MainMenuFrame(config));
-        while (frames.size() > 0) {
-            Frame frame = frames.removeFirst();
-            frame.start();
-            if (frame.possibleNextFrame()) {
-                frames.addLast(frame.getNextFrame());
-            }
-        }
+        KeyboardInput keyboardInput = new KeyboardInput(true);
+        start(keyboardInput);
     }
 
     /**
@@ -59,16 +78,13 @@ public class Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
-        // TODO: Fill out this method so that it run the engine using the input
-        // passed in as an argument, and return a 2D tile representation of the
-        // world that would have been drawn if the same inputs had been given
-        // to interactWithKeyboard().
-        //
-        // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
-        // that works for many different input types.
-        long seed = Long.parseLong(input);
-        World world = new World(WORLD_WIDTH, WORLD_HEIGHT);
-        world.randWorld(seed);
-        return world.tiles();
+        this.config.hideInterface = true;
+        StringInput stringInput = new StringInput(input);
+        start(stringInput);
+        return worldTiles;
+    }
+
+    public String toString() {
+        return TETile.toString(worldTiles);
     }
 }

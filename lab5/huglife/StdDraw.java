@@ -128,8 +128,8 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
     // singleton for callbacks: avoids generation of extra .class files
     private static StdDraw std = new StdDraw();
 
-    // the frame for drawing to the screen
-    private static JFrame frame;
+    // the userInterface for drawing to the screen
+    private static JFrame userInterface;
 
     // mouse state
     private static boolean mousePressed = false;
@@ -178,8 +178,8 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 
     // init
     private static void init() {
-        if (frame != null) frame.setVisible(false);
-        frame = new JFrame();
+        if (userInterface != null) userInterface.setVisible(false);
+        userInterface = new JFrame();
         offscreenImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         onscreenImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         offscreen = offscreenImage.createGraphics();
@@ -199,23 +199,23 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
         hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         offscreen.addRenderingHints(hints);
 
-        // frame stuff
+        // userInterface stuff
         ImageIcon icon = new ImageIcon(onscreenImage);
         JLabel draw = new JLabel(icon);
 
         draw.addMouseListener(std);
         draw.addMouseMotionListener(std);
 
-        frame.setContentPane(draw);
-        frame.addKeyListener(std);    // JLabel cannot get keyboard focus
-        frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);            // closes all windows
-        // frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);      // closes only current window
-        frame.setTitle("Standard Draw");
-        frame.setJMenuBar(createMenuBar());
-        frame.pack();
-        frame.requestFocusInWindow();
-        frame.setVisible(true);
+        userInterface.setContentPane(draw);
+        userInterface.addKeyListener(std);    // JLabel cannot get keyboard focus
+        userInterface.setResizable(false);
+        userInterface.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);            // closes all windows
+        // userInterface.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);      // closes only current window
+        userInterface.setTitle("Standard Draw");
+        userInterface.setJMenuBar(createMenuBar());
+        userInterface.pack();
+        userInterface.requestFocusInWindow();
+        userInterface.setVisible(true);
     }
 
     // create the menu bar (changed to private)
@@ -954,7 +954,7 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
     private static void draw() {
         if (defer) return;
         onscreen.drawImage(offscreenImage, 0, 0, null);
-        frame.repaint();
+        userInterface.repaint();
     }
 
 
@@ -1007,7 +1007,7 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
      * This method cannot be called directly.
      */
     public void actionPerformed(ActionEvent e) {
-        FileDialog chooser = new FileDialog(StdDraw.frame, "Use a .png or .jpg extension", FileDialog.SAVE);
+        FileDialog chooser = new FileDialog(StdDraw.userInterface, "Use a .png or .jpg extension", FileDialog.SAVE);
         chooser.setVisible(true);
         String filename = chooser.getFile();
         if (filename != null) {

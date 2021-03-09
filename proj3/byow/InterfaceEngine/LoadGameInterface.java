@@ -1,12 +1,13 @@
-package byow.FrameEngine;
+package byow.InterfaceEngine;
 
 import byow.Core.Config;
 import byow.Entity.World;
+import byow.Input.InputDevice;
 
 import java.io.*;
 
-public class LoadGameFrame extends BaseFrame {
-    public LoadGameFrame(Config config) {
+public class LoadGameInterface extends BaseInterface {
+    public LoadGameInterface (Config config) {
         super(config);
     }
 
@@ -17,7 +18,7 @@ public class LoadGameFrame extends BaseFrame {
     }
 
     @Override
-    public void start() {
+    public void start(InputDevice inputDevice) {
         File file = new File(config.FILE_NAME);
         if (!file.exists()) {
             System.out.println("file not found");
@@ -27,7 +28,7 @@ public class LoadGameFrame extends BaseFrame {
             FileInputStream fileInStream = new FileInputStream(file);
             ObjectInputStream objectInStream = new ObjectInputStream(fileInStream);
             World savedWorld = (World) objectInStream.readObject();
-            nextFrame = new WorldFrame(config, savedWorld);
+            nextUserInterface = new WorldInterface(config, savedWorld);
         } catch (FileNotFoundException e) {
             System.out.println("file not found");
             System.exit(0);

@@ -1,20 +1,20 @@
-package byow.FrameEngine;
+package byow.InterfaceEngine;
 
 import byow.Core.Config;
-import byow.Input.KeyboardInput;
+import byow.Input.InputDevice;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
 import java.util.HashMap;
 
-public class MainMenuFrame extends BaseFrame {
+public class MainMenuInterface extends BaseInterface {
     private final HashMap<Character, MenuItem> menuItemKeyMap;
 
     private enum MenuItem {
         NEW_GAME, LOAD_GAME, QUIT
     }
 
-    public MainMenuFrame (Config config) {
+    public MainMenuInterface (Config config) {
         super(config);
         this.menuItemKeyMap = new HashMap<>();
         menuItemKeyMap.put('n', MenuItem.NEW_GAME);
@@ -24,6 +24,9 @@ public class MainMenuFrame extends BaseFrame {
 
     @Override
     public void show() {
+        if (config.hideInterface) {
+            return;
+        }
         final Color BACKGROUND_COLOR = Color.BLACK;
         final Color PEN_COLOR = Color.WHITE;
 
@@ -55,19 +58,21 @@ public class MainMenuFrame extends BaseFrame {
     }
 
     @Override
-    public void start() {
+    public void start(InputDevice inputDevice) {
+        if (inputDevice == null) {
+            throw new IllegalArgumentException("No input to main menu interface.");
+        }
         show();
-        KeyboardInput keyboardInput = new KeyboardInput(true);
-        while (keyboardInput.possibleNextInput()) {
-            char gotKey = Character.toLowerCase(keyboardInput.getNextKey());
+        while (inputDevice.possibleNextInput()) {
+            char gotKey = Character.toLowerCase(inputDevice.getNextKey());
             if (!menuItemKeyMap.containsKey(gotKey)) {
                 continue;
             }
             MenuItem selectedItem = menuItemKeyMap.get(gotKey);
             boolean finished = true;
             switch (selectedItem) {
-                case NEW_GAME -> nextFrame = new NewGameFrame(config);
-                case LOAD_GAME -> nextFrame = new LoadGameFrame(config);
+                case NEW_GAME -> nextUserInterface = new NewGameInterface(config);
+                case LOAD_GAME -> nextUserInterface = new LoadGameInterface(config);
                 case QUIT -> System.exit(0);
                 default -> finished = false;
             }

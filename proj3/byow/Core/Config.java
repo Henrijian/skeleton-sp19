@@ -6,8 +6,9 @@ public class Config {
     public final int worldHeight;
     public final int frameWidth;
     public final int frameHeight;
+    public boolean hideInterface;
 
-    public Config(int worldWidth, int worldHeight, int frameWidth, int frameHeight) {
+    public Config(int worldWidth, int worldHeight, int frameWidth, int frameHeight, boolean hideInterface) {
         if (worldWidth <= 0) {
             throw new IllegalArgumentException("Width of world cannot less than or equals to zero.");
         }
@@ -24,5 +25,6 @@ public class Config {
         this.worldHeight = worldHeight;
         this.frameWidth = frameWidth;
         this.frameHeight = frameHeight;
+        this.hideInterface = hideInterface;
     }
 }

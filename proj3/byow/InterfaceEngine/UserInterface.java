@@ -1,6 +1,8 @@
-package byow.FrameEngine;
+package byow.InterfaceEngine;
 
-public interface Frame {
+import byow.Input.InputDevice;
+
+public interface UserInterface {
     /**
      * @return Width of this frame in pixels.
      */
@@ -19,17 +21,17 @@ public interface Frame {
     /**
      * Executing this frame.
      */
-    void start();
+    void start(InputDevice inputDevice);
 
     /**
      * Is there having next frame resulting from this frame.
      * @return True, if there have any frame, else false.
      */
-    boolean possibleNextFrame();
+    boolean possibleNextInterface();
 
     /**
      * If possibleNextFrame is true, return the resulting next frame, else throwing an exception.
      * @return The resulting next frame, else an exception.
      */
-    Frame getNextFrame();
+    UserInterface getNextInterface();
 }

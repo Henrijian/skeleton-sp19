@@ -1,13 +1,13 @@
-package byow.FrameEngine;
+package byow.InterfaceEngine;
 
 import byow.Core.Config;
-import byow.Input.KeyboardInput;
+import byow.Input.InputDevice;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
 import java.util.HashMap;
 
-public class NewGameFrame extends BaseFrame {
+public class NewGameInterface extends BaseInterface {
     private final HashMap<Character, Action> actionKeyMap;
     private long seed;
 
@@ -15,7 +15,7 @@ public class NewGameFrame extends BaseFrame {
         GO_BACK, START_GAME
     }
 
-    public NewGameFrame(Config config) {
+    public NewGameInterface (Config config) {
         super(config);
         this.actionKeyMap = new HashMap<>();
         actionKeyMap.put('b', Action.GO_BACK);
@@ -25,6 +25,9 @@ public class NewGameFrame extends BaseFrame {
 
     @Override
     public void show() {
+        if (config.hideInterface) {
+            return;
+        }
         final Color BACKGROUND_COLOR = Color.BLACK;
         StdDraw.clear(BACKGROUND_COLOR);
         final Color PEN_COLOR = Color.WHITE;
@@ -61,20 +64,22 @@ public class NewGameFrame extends BaseFrame {
     }
 
     @Override
-    public void start() {
+    public void start(InputDevice inputDevice) {
+        if (inputDevice == null) {
+            throw new IllegalArgumentException("No input to new game interface.");
+        }
         show();
-        KeyboardInput keyboardInput = new KeyboardInput(true);
-        while (keyboardInput.possibleNextInput()) {
-            char gotKey = Character.toLowerCase(keyboardInput.getNextKey());
+        while (inputDevice.possibleNextInput()) {
+            char gotKey = Character.toLowerCase(inputDevice.getNextKey());
             if (actionKeyMap.containsKey(gotKey)) {
                 Action selectedAction = actionKeyMap.get(gotKey);
                 boolean finished = true;
                 switch (selectedAction) {
                     case GO_BACK:
-                        nextFrame = new MainMenuFrame(config);
+                        nextUserInterface = new MainMenuInterface(config);
                         break;
                     case START_GAME:
-                        nextFrame = new WorldFrame(config, seed);
+                        nextUserInterface = new WorldInterface(config, seed);
                         break;
                     default:
                         finished = false;

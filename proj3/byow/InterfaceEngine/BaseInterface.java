@@ -1,24 +1,30 @@
-package byow.FrameEngine;
+package byow.InterfaceEngine;
 
 import byow.Core.Config;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.util.NoSuchElementException;
 
-abstract class BaseFrame implements Frame {
+abstract class BaseInterface implements UserInterface {
     Config config;
-    Frame nextFrame;
+    UserInterface nextUserInterface;
 
-    public BaseFrame(Config config) {
+    public BaseInterface (Config config) {
         if (config == null) {
             throw new IllegalArgumentException("Cannot initiate base frame without config.");
         }
         this.config = config;
+        if (!config.hideInterface) {
+            initializeCanvas();
+        }
+        this.nextUserInterface = null;
+    }
+
+    private void initializeCanvas() {
         StdDraw.setCanvasSize(width(), height());
         StdDraw.setXscale(0, width());
         StdDraw.setYscale(0, height());
         StdDraw.enableDoubleBuffering();
-        this.nextFrame = null;
     }
 
     @Override
@@ -32,15 +38,15 @@ abstract class BaseFrame implements Frame {
     }
 
     @Override
-    public boolean possibleNextFrame() {
-        return nextFrame != null;
+    public boolean possibleNextInterface() {
+        return nextUserInterface != null;
     }
 
     @Override
-    public Frame getNextFrame() {
-        if (nextFrame == null) {
+    public UserInterface getNextInterface() {
+        if (nextUserInterface == null) {
             throw new NoSuchElementException("There is no next frame can be accessed.");
         }
-        return nextFrame;
+        return nextUserInterface;
     }
 }
