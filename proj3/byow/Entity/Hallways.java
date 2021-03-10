@@ -68,6 +68,7 @@ public class Hallways extends HashSet<Hallway> {
             }
             List<Point> trace = PointUtils.shortestTrace(hallWay.from, hallWay.to, blockedPosSet);
             if (trace == null) {
+                System.out.println(TETile.toString(tiles));
                 continue;
             }
             hallwayTraces.put(hallWay, trace);

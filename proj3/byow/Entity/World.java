@@ -103,8 +103,8 @@ public class World implements Serializable {
         int randRoomIdx = random.nextInt(rooms.size());
         RectRoom room = rooms.get(randRoomIdx);
         Rectangle innerSpace = room.innerShape();
-        int randX = random.nextInt(innerSpace.leftBottomCorner.x + innerSpace.width);
-        int randY = random.nextInt(innerSpace.leftBottomCorner.y + innerSpace.height);
+        int randX = innerSpace.leftBottomCorner.x + random.nextInt(innerSpace.width);
+        int randY = innerSpace.leftBottomCorner.y + random.nextInt(innerSpace.height);
         userPosition.x = randX;
         userPosition.y = randY;
     }

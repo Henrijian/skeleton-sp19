@@ -203,7 +203,7 @@ public class WorldInterface extends BaseInterface {
                     if (gotKey == QUIT_GAME_COMMAND) {
                         // Save and exit.
                         saveWorld();
-                        TETile.toString(world.tiles());
+                        System.out.println(TETile.toString(world.tiles()));
                         System.exit(0);
                     }
                 } else {

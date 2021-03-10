@@ -68,30 +68,50 @@ public class PointUtils {
         if (end == null) {
             throw new IllegalArgumentException("Cannot get the shortest trace to null end point.");
         }
+        // A* to find the shortest path between two points.
         ArrayHeapMinPQ<Point> distanceMinPQ = new ArrayHeapMinPQ<>();
-        LinkedList<Point> trace = new LinkedList<>();
-        distanceMinPQ.add(start, distanceSqrBetween(start, end));
+        HashMap<Point, Integer> distTo = new HashMap<>();
+        distTo.put(start, 0);
+        HashMap<Point, Point> edgeTo = new HashMap<>();
+        HashSet<Point> visited = new HashSet<>();
+        distanceMinPQ.add(start, distanceSqrBetween(start, start) + distanceSqrBetween(start, end));
         while (distanceMinPQ.size() > 0) {
-            Point tracePos = distanceMinPQ.removeSmallest();
-            trace.addLast(tracePos);
-            if (tracePos.equals(end)) {
+            Point pos = distanceMinPQ.removeSmallest();
+            visited.add(pos);
+            if (pos.equals(end)) {
                 break;
             }
-            Point[] verticalPosList = PointUtils.verticalNeighbors(tracePos);
-            for (Point verticalPos: verticalPosList) {
-                if (distanceMinPQ.contains(verticalPos)) {
+            Point[] vertPosList = verticalNeighbors(pos);
+            for (Point vertPos: vertPosList) {
+                if (visited.contains(vertPos)) {
                     continue;
                 }
-                if (trace.contains(verticalPos)) {
+                if (blocks != null && blocks.contains(vertPos)) {
                     continue;
                 }
-                if (blocks != null && blocks.contains(verticalPos)) {
-                    continue;
+                int startToVertPos = distTo.get(pos) + distanceSqrBetween(pos, vertPos);
+                if (!distTo.containsKey(vertPos) || distTo.get(vertPos) > startToVertPos) {
+                    distTo.put(vertPos, startToVertPos);
+                    edgeTo.put(vertPos, pos);
                 }
-                int distanceSqr = PointUtils.distanceSqrBetween(verticalPos, end);
-                distanceMinPQ.add(verticalPos, distanceSqr);
+                int vertPosToEnd = distanceSqrBetween(vertPos, end);
+                int distanceSqr = startToVertPos + vertPosToEnd;
+                if (!distanceMinPQ.contains(vertPos)) {
+                    distanceMinPQ.add(vertPos, distanceSqr);
+                }
+                if (distanceMinPQ.peekPriority(vertPos) > distanceSqr) {
+                    distanceMinPQ.changePriority(vertPos, distanceSqr);
+                }
             }
         }
+        // Fill the trace list with shortest path positions.
+        LinkedList<Point> trace = new LinkedList<>();
+        Point tracePos = end;
+        while (tracePos != start && tracePos != null) {
+            trace.addFirst(tracePos);
+            tracePos = edgeTo.get(tracePos);
+        }
+        trace.addFirst(tracePos);
         // Check whether the trace connects start and end points.
         if (!trace.getFirst().equals(start) || !trace.getLast().equals(end)) {
             // Cannot get the trace which connects start and end points.
