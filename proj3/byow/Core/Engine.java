@@ -10,7 +10,7 @@ import byow.TileEngine.TETile;
 
 import java.util.LinkedList;
 
-public class Game {
+public class Engine {
     /* Feel free to change the width and height. */
     public static final int WORLD_WIDTH = 80;
     public static final int WORLD_HEIGHT = 30;
@@ -20,7 +20,7 @@ public class Game {
     private final Config config;
     private TETile[][] worldTiles; // Tiles of world representing last state of world.
 
-    public Game () {
+    public Engine () {
         this.config = new Config(WORLD_WIDTH, WORLD_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT, false);
         this.worldTiles = null;
     }
