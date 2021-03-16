@@ -70,7 +70,7 @@ public class Hallway implements Serializable {
                 blockedPosSet.add(blockPos);
             }
         }
-        List<Point> trace = PointUtils.shortestTrace(from, to, blockedPosSet);
+        List<Point> trace = PointUtils.shortestTrace(from, to, blockedPosSet, minX, minY, maxX, maxY);
         // Fill floor of hallway.
         for (Point tracePos: trace) {
             tiles[tracePos.x][tracePos.y] = floorTile;
